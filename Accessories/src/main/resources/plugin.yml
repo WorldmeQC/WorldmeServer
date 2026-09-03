@@ -1,0 +1,8 @@
+name: Worldme-Accessories
+version: 1.0.0
+main: top.worldme.Accessories
+api-version: '26.2'
+author: WorldmeQC
+description: Worldme 服务器 饰品插件
+softdepend:
+  - CraftEngine

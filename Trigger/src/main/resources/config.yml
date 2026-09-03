@@ -1,0 +1,15 @@
+worlds:
+  nether:
+    environment: NETHER
+    world-name: world_nether
+    permissions:
+      - "multiverse.access.world_nether"
+      - "multiverse.teleport.self.world_nether"
+    actionbar-message: "&a你已解锁 &c地狱 &a传送权限！"
+  end:
+    environment: THE_END
+    world-name: world_the_end
+    permissions:
+      - "multiverse.access.world_the_end"
+      - "multiverse.teleport.self.world_the_end"
+    actionbar-message: "&a你已解锁 &5末地 &a传送权限！"

@@ -1,0 +1,19 @@
+name: Worldme-Trigger
+version: 1.0.0
+main: top.worldme.Trigger
+api-version: '26.2'
+author: WorldmeQC
+description: Worldme 服务器 触发器插件
+softdepend:
+  - LuckPerms
+  - Multiverse-Core
+commands:
+  worldmetrigger:
+    description: Worldme-Trigger 管理命令
+    usage: /worldmetrigger reload
+    aliases: [wmt]
+    permission: worldme.trigger.admin
+permissions:
+  worldme.trigger.admin:
+    default: op
+    description: 允许使用 Worldme-Trigger 管理命令
