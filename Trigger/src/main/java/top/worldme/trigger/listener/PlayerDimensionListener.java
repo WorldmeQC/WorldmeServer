@@ -8,12 +8,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 import top.worldme.trigger.config.TriggerConfig;
 import top.worldme.trigger.data.PlayerUnlockData;
 
 public class PlayerDimensionListener implements Listener {
 
-    private final org.bukkit.plugin.java.JavaPlugin plugin;
+    private final JavaPlugin plugin;
     private final TriggerConfig triggerConfig;
     private final PlayerUnlockData playerUnlockData;
     private final LuckPerms luckPerms;

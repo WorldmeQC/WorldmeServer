@@ -8,6 +8,7 @@ import top.worldme.trigger.command.TriggerCommand;
 import top.worldme.trigger.config.TriggerConfig;
 import top.worldme.trigger.data.PlayerUnlockData;
 import top.worldme.trigger.listener.PlayerDimensionListener;
+import top.worldme.trigger.listener.StructureGenerateListener;
 
 public class Trigger extends JavaPlugin {
 
@@ -29,6 +30,11 @@ public class Trigger extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(
                 new PlayerDimensionListener(this, triggerConfig, playerUnlockData, luckPerms),
+                this
+        );
+
+        Bukkit.getPluginManager().registerEvents(
+                new StructureGenerateListener(),
                 this
         );
 
