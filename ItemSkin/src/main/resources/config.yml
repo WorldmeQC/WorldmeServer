@@ -4,6 +4,10 @@
 # 支持的类型：SWORD, BOW, CROSSBOW, AXE, PICKAXE, SHOVEL, HOE, MACE, SPEAR
 # 后续将支持：HELMET, CHESTPLATE, LEGGINGS, BOOTS, ELYTRA
 
+# 是否允许把外观应用到 CraftEngine 自定义物品上
+# 默认 false，保持保守行为；设为 true 可让玩家给 CE 武器也换皮
+allow-custom-item-targets: false
+
 skins:
   # 示例：烈焰剑外观
   # worldme:fire_sword_skin:

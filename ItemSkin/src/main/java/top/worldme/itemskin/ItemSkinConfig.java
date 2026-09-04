@@ -19,6 +19,7 @@ public class ItemSkinConfig {
     private final ItemSkin plugin;
     private final Map<String, Skin> skinsById = new HashMap<>();
     private boolean loaded = false;
+    private boolean allowCustomItemTargets = false;
 
     public ItemSkinConfig(ItemSkin plugin) {
         this.plugin = plugin;
@@ -32,6 +33,7 @@ public class ItemSkinConfig {
     public void load(FileConfiguration config) {
         skinsById.clear();
         loaded = false;
+        allowCustomItemTargets = config.getBoolean("allow-custom-item-targets", false);
 
         ConfigurationSection skinsSection = config.getConfigurationSection("skins");
         if (skinsSection == null) {
@@ -128,6 +130,10 @@ public class ItemSkinConfig {
 
     public boolean isLoaded() {
         return loaded;
+    }
+
+    public boolean isAllowCustomItemTargets() {
+        return allowCustomItemTargets;
     }
 
     public Collection<Skin> getAllSkins() {

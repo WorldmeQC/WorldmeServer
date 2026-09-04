@@ -53,7 +53,7 @@ public class InventoryListener implements Listener {
         if (skin == null) return;
 
         if (current == null || current.getType() == Material.AIR) return;
-        if (CraftEngineItems.isCustomItem(current)) {
+        if (!config.isAllowCustomItemTargets() && CraftEngineItems.isCustomItem(current)) {
             player.sendMessage("§c该物品已经是自定义物品，无法应用外观。");
             event.setCancelled(true);
             return;
