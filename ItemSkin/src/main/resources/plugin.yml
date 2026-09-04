@@ -1,0 +1,19 @@
+name: Worldme-ItemSkin
+version: 1.0.0
+main: top.worldme.ItemSkin
+api-version: '26.2'
+author: WorldmeQC
+description: Worldme 服务器 物品装饰插件
+softdepend:
+  - CraftEngine
+commands:
+  itemskin:
+    description: Worldme-ItemSkin 外观管理命令
+    usage: /itemskin <unload|reload>
+    aliases:
+      - iskin
+    permission: worldme.itemskin.admin
+permissions:
+  worldme.itemskin.admin:
+    default: op
+    description: 允许使用 Worldme-ItemSkin 管理命令

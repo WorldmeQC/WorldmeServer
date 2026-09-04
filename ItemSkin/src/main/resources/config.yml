@@ -1,0 +1,24 @@
+# ItemSkin 配置文件
+# 每个皮肤对应一个 CraftEngine 自定义物品 ID
+# applicable 表示该皮肤可以应用到哪些类型的原版物品上
+# 支持的类型：SWORD, BOW, CROSSBOW, AXE, PICKAXE, SHOVEL, HOE, MACE, SPEAR
+# 后续将支持：HELMET, CHESTPLATE, LEGGINGS, BOOTS, ELYTRA
+
+skins:
+  # 示例：烈焰剑外观
+  # worldme:fire_sword_skin:
+  #   applicable:
+  #     - SWORD
+  #     - AXE
+  #   # display-name 可选，默认自动读取 CE 物品的显示名
+  #   display-name: "烈焰之剑"
+
+  # 示例：寒冰弓外观
+  # worldme:ice_bow_skin:
+  #   applicable:
+  #     - BOW
+
+  # 示例：钻石矛外观
+  # worldme:diamond_spear_skin:
+  #   applicable:
+  #     - SPEAR
