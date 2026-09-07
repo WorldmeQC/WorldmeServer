@@ -1,6 +1,11 @@
 package top.worldme;
 
+import net.momirealms.customfishing.api.BukkitCustomFishingPlugin;
+import net.momirealms.customfishing.api.mechanic.action.ActionManager;
+import net.momirealms.customfishing.api.mechanic.context.ContextKeys;
+import net.momirealms.customfishing.api.mechanic.requirement.RequirementFactory;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.worldme.fishing.command.FishingCommand;
 import top.worldme.fishing.config.FishingConfig;
@@ -41,7 +46,7 @@ public class Fishing extends JavaPlugin {
         FishingCommand fishingCommand = new FishingCommand(this, questManager, menuConfig, fishingConfig);
         getCommand("wmfishing").setExecutor(fishingCommand);
         getCommand("wmfishing").setTabCompleter(fishingCommand);
-
+        Bukkit.getScheduler().runTask(this, this::registerCustomRequirement);
         getLogger().info("Worldme-Fishing 已加载。");
     }
 
@@ -71,5 +76,39 @@ public class Fishing extends JavaPlugin {
 
     public QuestManager getQuestManager() {
         return questManager;
+    }
+
+    public void registerCustomRequirement() {
+        if (Bukkit.getPluginManager().getPlugin("CustomFishing") == null) {
+            this.getLogger().warning("未检测到 CustomFishing，任务鱼可钓控制将不会生效。");
+            return;
+        }
+        try {
+            BukkitCustomFishingPlugin api = BukkitCustomFishingPlugin.getInstance();
+            RequirementFactory<Player> factory = (args, actions, runActions) -> context -> {
+                Player player = context.holder();
+                if (player == null) {
+                    return false;
+                }
+                String lootId = context.arg(ContextKeys.ID);
+                if (lootId == null) {
+                    return false;
+                }
+                if (questManager.isQuestActiveForLoot(player, lootId)) {
+                    return true;
+                }
+                if (runActions && !actions.isEmpty()) {
+                    ActionManager.trigger(context, actions);
+                }
+                return false;
+            };
+            boolean registered = api.getRequirementManager().registerRequirement(factory, "fisherman_quest");
+            if (registered) {
+                this.getLogger().info("已向 CustomFishing 注册 fisherman_quest 条件。");
+            }
+        } catch (Exception e) {
+            this.getLogger().severe("注册 CustomFishing 自定义条件失败: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

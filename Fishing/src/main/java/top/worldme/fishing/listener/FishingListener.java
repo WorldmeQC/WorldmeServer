@@ -2,12 +2,17 @@ package top.worldme.fishing.listener;
 
 import net.momirealms.customfishing.api.BukkitCustomFishingPlugin;
 import net.momirealms.customfishing.api.event.CustomFishingReloadEvent;
+import net.momirealms.customfishing.api.event.FishingBagPreCollectEvent;
+import net.momirealms.customfishing.api.event.FishingEffectApplyEvent;
 import net.momirealms.customfishing.api.event.FishingLootSpawnEvent;
 import net.momirealms.customfishing.api.event.FishingResultEvent;
 import net.momirealms.customfishing.api.event.MarketSellEvent;
 import net.momirealms.customfishing.api.mechanic.action.ActionManager;
 import net.momirealms.customfishing.api.mechanic.context.ContextKeys;
+import net.momirealms.customfishing.api.mechanic.effect.Effect;
+import net.momirealms.customfishing.api.mechanic.loot.operation.WeightOperation;
 import net.momirealms.customfishing.api.mechanic.requirement.RequirementFactory;
+import net.momirealms.customfishing.common.util.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -22,8 +27,10 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.worldme.fishing.config.FishingConfig.QuestFish;
 import top.worldme.fishing.quest.QuestManager;
+import top.worldme.fishing.quest.QuestManager.QuestState;
 import top.worldme.fishing.util.QuestKeys;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FishingListener implements Listener {
@@ -36,40 +43,6 @@ public class FishingListener implements Listener {
         this.plugin = plugin;
         this.questManager = questManager;
         this.keys = keys;
-    }
-
-    public void registerCustomRequirement() {
-        if (Bukkit.getPluginManager().getPlugin("CustomFishing") == null) {
-            plugin.getLogger().warning("未检测到 CustomFishing，任务鱼可钓控制将不会生效。");
-            return;
-        }
-        try {
-            BukkitCustomFishingPlugin api = BukkitCustomFishingPlugin.getInstance();
-            RequirementFactory<Player> factory = (args, actions, runActions) -> context -> {
-                Player player = context.holder();
-                if (player == null) {
-                    return false;
-                }
-                String lootId = context.arg(ContextKeys.ID);
-                if (lootId == null) {
-                    return false;
-                }
-                if (questManager.isQuestActiveForLoot(player, lootId)) {
-                    return true;
-                }
-                if (runActions && !actions.isEmpty()) {
-                    ActionManager.trigger(context, actions);
-                }
-                return false;
-            };
-            boolean registered = api.getRequirementManager().registerRequirement(factory, "fisherman_quest");
-            if (registered) {
-                plugin.getLogger().info("已向 CustomFishing 注册 fisherman_quest 条件。");
-            }
-        } catch (Exception e) {
-            plugin.getLogger().severe("注册 CustomFishing 自定义条件失败: " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -89,14 +62,47 @@ public class FishingListener implements Listener {
         }
 
         // 兜底：如果 somehow 任务鱼在不满足条件时被钓到，直接取消
+        // 注：onEffectApply 已在 LOOT 阶段通过 weight operation 将不可钓的任务鱼权重置 0，
+        // 此处兜底极少触发。
         if (!questManager.isQuestActiveForLoot(player, lootId)) {
             event.setCancelled(true);
             return;
         }
 
         questManager.markCaught(player);
-        // 同时给背包里已获得的该任务鱼打上 PDC（兼容直接进背包/钓鱼袋的情况）
+        // 立即尝试给背包里已获得的该任务鱼打上 PDC
         questManager.tagInventoryQuestFish(player, questFish);
+        // 延迟再次尝试，兼容 CustomFishing 直接进背包/钓鱼袋等异步交付场景
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (!player.isOnline()) {
+                return;
+            }
+            questManager.tagInventoryQuestFish(player, questFish);
+        }, 2L);
+    }
+
+    /**
+     * 在 CustomFishing 计算本次战利品前，把当前不应被钓到的任务鱼权重置 0，
+     * 使其不会出现在结果中，而是从其它战利品里重新抽取。
+     */
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onEffectApply(FishingEffectApplyEvent event) {
+        if (event.getStage() != FishingEffectApplyEvent.Stage.LOOT) {
+            return;
+        }
+        Effect effect = event.getEffect();
+        List<Pair<String, WeightOperation>> ops = new ArrayList<>(effect.weightOperations());
+        for (QuestFish questFish : questManager.config().getQuestFishes()) {
+            String lootId = questFish.cfLootId();
+            ops.add(Pair.of(lootId, (context, weight, map) -> {
+                Player player = context.holder();
+                if (player == null) {
+                    return weight;
+                }
+                return questManager.isQuestActiveForLoot(player, lootId) ? weight : 0.0;
+            }));
+        }
+        effect.weightOperations(ops);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -135,6 +141,33 @@ public class FishingListener implements Listener {
         itemStack.setItemMeta(meta);
     }
 
+    /**
+     * 任务鱼被收集进 CustomFishing 钓鱼袋时打上 PDC，防止提交时找不到。
+     */
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onBagPreCollect(FishingBagPreCollectEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = event.getItemStack();
+        if (item == null || item.getType().isAir() || !item.hasItemMeta()) {
+            return;
+        }
+        QuestState state = questManager.getState(player);
+        if (state.questFish() == null || !state.caught() || state.completed()) {
+            return;
+        }
+        if (!questManager.matchesQuestItem(item, state.questFish().ceItemId())) {
+            return;
+        }
+        ItemMeta meta = item.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        if (pdc.has(keys.owner, PersistentDataType.STRING) || pdc.has(keys.cycle, PersistentDataType.STRING)) {
+            return;
+        }
+        pdc.set(keys.owner, PersistentDataType.STRING, player.getUniqueId().toString());
+        pdc.set(keys.cycle, PersistentDataType.STRING, questManager.getCurrentCycleKey());
+        item.setItemMeta(meta);
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onMarketSell(MarketSellEvent event) {
         List<ItemStack> items = event.getItems();
@@ -150,9 +183,4 @@ public class FishingListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onCustomFishingReload(CustomFishingReloadEvent event) {
-        // CustomFishing 重载后重新注册条件
-        Bukkit.getScheduler().runTask(plugin, this::registerCustomRequirement);
-    }
 }

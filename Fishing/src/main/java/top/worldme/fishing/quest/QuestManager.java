@@ -3,6 +3,8 @@ package top.worldme.fishing.quest;
 import net.momirealms.craftengine.bukkit.api.CraftEngineItems;
 import net.momirealms.craftengine.bukkit.item.BukkitItemDefinition;
 import net.momirealms.craftengine.core.util.Key;
+import net.momirealms.customfishing.api.BukkitCustomFishingPlugin;
+import net.momirealms.customfishing.api.mechanic.item.CustomFishingItem;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -167,15 +169,20 @@ public class QuestManager {
             if (!matchesQuestItem(item, questFish.ceItemId())) {
                 continue;
             }
-            ItemMeta meta = item.getItemMeta();
-            PersistentDataContainer pdc = meta.getPersistentDataContainer();
-            if (pdc.has(keys.owner, PersistentDataType.STRING) || pdc.has(keys.cycle, PersistentDataType.STRING)) {
-                continue;
-            }
-            pdc.set(keys.owner, PersistentDataType.STRING, ownerUuid);
-            pdc.set(keys.cycle, PersistentDataType.STRING, cycle);
-            item.setItemMeta(meta);
+            tagQuestItem(item, ownerUuid, cycle);
         }
+    }
+
+    private boolean tagQuestItem(ItemStack item, String ownerUuid, String cycle) {
+        ItemMeta meta = item.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        if (pdc.has(keys.owner, PersistentDataType.STRING) || pdc.has(keys.cycle, PersistentDataType.STRING)) {
+            return false;
+        }
+        pdc.set(keys.owner, PersistentDataType.STRING, ownerUuid);
+        pdc.set(keys.cycle, PersistentDataType.STRING, cycle);
+        item.setItemMeta(meta);
+        return true;
     }
 
     public void markCompleted(Player player) {
@@ -191,7 +198,8 @@ public class QuestManager {
     }
 
     /**
-     * 在玩家背包中寻找一条有效的任务鱼（含正确 PDC）
+     * 在玩家背包中寻找一条有效的任务鱼（含正确 PDC）。
+     * 若玩家已钓到但物品缺少 PDC，会尝试兜底标记并返回该物品。
      */
     public ItemStack findValidQuestFish(Player player) {
         QuestState state = getState(player);
@@ -203,10 +211,12 @@ public class QuestManager {
         String ownerUuid = player.getUniqueId().toString();
 
         PlayerInventory inventory = player.getInventory();
+        ItemStack fallback = null;
         for (ItemStack item : inventory.getStorageContents()) {
             if (item == null || item.getType().isAir() || !item.hasItemMeta()) {
                 continue;
             }
+            BukkitCustomFishingPlugin api = BukkitCustomFishingPlugin.getInstance();
             if (!matchesQuestItem(item, expectedCeItemId)) {
                 continue;
             }
@@ -215,6 +225,16 @@ public class QuestManager {
             String itemCycle = pdc.get(keys.cycle, PersistentDataType.STRING);
             if (ownerUuid.equals(itemOwner) && currentCycle.equals(itemCycle)) {
                 return item;
+            }
+            if (fallback == null && !pdc.has(keys.owner, PersistentDataType.STRING) && !pdc.has(keys.cycle, PersistentDataType.STRING)) {
+                fallback = item;
+            }
+        }
+
+        // 兜底：已钓到任务鱼但 PDC 标记缺失时，现场补标
+        if (fallback != null && state.caught() && !state.completed()) {
+            if (tagQuestItem(fallback, ownerUuid, currentCycle)) {
+                return fallback;
             }
         }
         return null;
