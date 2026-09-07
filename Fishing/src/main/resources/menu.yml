@@ -1,0 +1,52 @@
+title: "<gold><bold>渔夫任务"
+rows: 3
+items:
+  decoration:
+    # material 支持以 ce: 开头绑定 CraftEngine 物品，例如 "ce:myitems:fisher_icon"
+    material: GRAY_STAINED_GLASS_PANE
+    name: " "
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 18
+      - 19
+      - 20
+      - 21
+      - 22
+      - 23
+      - 24
+      - 25
+      - 26
+  quest-info:
+    slot: 11
+    # 当没有任务或任务鱼 CE 物品不存在时的回退显示
+    fallback-material: BARRIER
+    fallback-name: "<red>未知任务鱼"
+    fallback-lore:
+      - "<gray>请联系管理员"
+    name: "<aqua>今日任务鱼: <yellow>%fish_name%"
+    lore:
+      - "<dark_gray>─────────────"
+      - "%lore%"
+      - "<dark_gray>─────────────"
+      - "<gray>状态: <white>%status%"
+  complete-button:
+    slot: 15
+    ready:
+      material: LIME_DYE
+      name: "<green>点击完成任务"
+      lore:
+        - "<gray>上交任务鱼并领取奖励"
+    not-ready:
+      material: RED_DYE
+      name: "<red>未满足条件"
+      lore:
+        - "<gray>你还没有钓到今天的任务鱼"
+        - "<gray>去指定位置钓到任务鱼后再来"

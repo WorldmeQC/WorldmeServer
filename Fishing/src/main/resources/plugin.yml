@@ -1,0 +1,21 @@
+name: Worldme-Fishing
+version: 1.0.0
+main: top.worldme.Fishing
+api-version: '26.2'
+author: WorldmeQC
+description: Worldme 服务器 钓鱼插件
+softdepend:
+  - CustomFishing
+  - CraftEngine
+commands:
+  wmfishing:
+    description: Worldme-Fishing 渔夫任务命令
+    aliases:
+      - wmf
+    permission: worldme.fishing.use
+    usage: /wmfishing [open <玩家> | reload]
+permissions:
+  worldme.fishing.use:
+    default: true
+  worldme.fishing.admin:
+    default: op

@@ -12,12 +12,13 @@ Each subproject builds one independent plugin JAR.
 
 ## Modules
 
-| Subproject | Plugin name        | Extra compile-only deps                          | Notes                                     |
-|------------|--------------------|--------------------------------------------------|-------------------------------------------|
-| AutoClear  | Worldme-AutoClear  | none                                             | Simple plugin, no external soft-depends.  |
-| Trigger    | Worldme-Trigger    | `net.luckperms:api:5.5`                          | Soft-depends on `LuckPerms`, `Multiverse-Core`. Command `/worldmetrigger` (alias `/wmt`). |
-| Accessories| Worldme-Accessories| `net.momirealms:craft-engine-core:26.7.4`        | Soft-depends on `CraftEngine`.            |
-| ItemSkin   | Worldme-ItemSkin   | `net.momirealms:craft-engine-bukkit:26.7.4`      | Soft-depends on `CraftEngine`.            |
+| Subproject  | Plugin name        | Extra compile-only deps                          | Notes                                     |
+|-------------|--------------------|--------------------------------------------------|-------------------------------------------|
+| AutoClear   | Worldme-AutoClear  | none                                             | Simple plugin, no external soft-depends.  |
+| Trigger     | Worldme-Trigger    | `net.luckperms:api:5.5`                          | Soft-depends on `LuckPerms`, `Multiverse-Core`. Command `/worldmetrigger` (alias `/wmt`). |
+| Accessories | Worldme-Accessories| `net.momirealms:craft-engine-core:26.7.4`        | Soft-depends on `CraftEngine`.            |
+| ItemSkin    | Worldme-ItemSkin   | `net.momirealms:craft-engine-bukkit:26.7.4`      | Soft-depends on `CraftEngine`.            |
+| Fishing     | Worldme-Fishing    | `net.momirealms:custom-fishing:2.3.24`, `net.momirealms:craft-engine-core:26.7.4`, `net.momirealms:craft-engine-bukkit:26.7.4` | Soft-depends on `CustomFishing` and `CraftEngine`. Command `/wmfishing` (alias `/wmf`), `/wmfishing open <player>` for NPCs. |
 
 ## Build commands
 

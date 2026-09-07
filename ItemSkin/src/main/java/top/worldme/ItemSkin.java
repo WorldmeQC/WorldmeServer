@@ -22,12 +22,6 @@ public class ItemSkin extends JavaPlugin {
         this.itemSkinConfig = new ItemSkinConfig(this);
         this.skinService = new SkinService();
 
-        // 尝试加载配置；如果 CE 还没加载，会在 CraftEngineReloadEvent 中重新加载
-        try {
-            itemSkinConfig.load(getConfig());
-        } catch (Exception e) {
-            getLogger().warning("ItemSkin 初次加载配置失败，将在 CraftEngine 加载完成后重试。");
-        }
 
         // 注册事件
         getServer().getPluginManager().registerEvents(new InventoryListener(itemSkinConfig, skinService), this);

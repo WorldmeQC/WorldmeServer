@@ -1,0 +1,54 @@
+cycle-time: "04:30"
+
+messages:
+  prefix: "<gold>[渔夫] "
+  no-quest-from-command: "<red>请去找渔夫对话领取今天的任务。"
+  quest-assigned: "<green>渔夫给了你今天的任务：<yellow>%fish_name%</yellow>，去%hint%找找看吧。"
+  already-completed: "<green>你今天已经完成渔夫任务了，明天再来吧。"
+  reward-received: "<green>任务完成！奖励已发放。"
+  no-valid-quest-fish: "<red>你的背包里没有有效的任务鱼。"
+  no-permission: "<red>你没有权限执行此命令。"
+  player-not-found: "<red>找不到玩家：<white>%player%。"
+  config-reloaded: "<green>配置已重载。"
+
+# 任务鱼池
+# 你需要在 CustomFishing 的 loot 配置中为每个 cf-loot-id 添加：
+#   requirements:
+#     - type: fisherman_quest
+quest-fishes:
+  - cf-loot-id: "daily_fish_snow"
+    ce-item-id: "myitems:quest_fish_snow"
+    weight: 10
+    # 任务鱼描述，支持多行，在 menu.yml 中用 %lore% 引用
+    lore:
+      - "<white>雪原的湖泊深处"
+      - "<gray>需要在开阔水域垂钓"
+      - "<gray>建议携带高级鱼竿"
+
+  - cf-loot-id: "daily_fish_ocean"
+    ce-item-id: "myitems:quest_fish_ocean"
+    weight: 10
+    lore:
+      - "<white>温暖的海洋"
+      - "<gray>雨天出现几率更高"
+
+# 完成次数奖池
+# 玩家累计完成渔夫任务达到指定次数时，从对应奖池抽取奖励。
+# 未配置特定次数时，使用 default 奖池。
+# 指令中 <player> 替换为玩家名，<uuid> 替换为玩家 UUID。
+reward-pools:
+  default:
+    - command: "give <player> diamond 1"
+    - command: "eco give <player> 50"
+
+  1:
+    - command: "give <player> diamond 5"
+    - command: "say <player> 完成了第一次渔夫任务！"
+
+  5:
+    - command: "give <player> emerald 3"
+
+  10:
+    - command: "give <player> netherite_ingot 1"
+    - ce-item-id: "myitems:fisher_trophy"
+      amount: 1
