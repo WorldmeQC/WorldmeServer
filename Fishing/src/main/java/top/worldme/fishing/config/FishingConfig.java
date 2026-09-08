@@ -11,8 +11,8 @@ public class FishingConfig {
     private final JavaPlugin plugin;
     private final List<QuestFish> questFishes = new ArrayList<>();
     private final Map<String, String> messages = new HashMap<>();
-    private final List<Reward> defaultRewards = new ArrayList<>();
-    private final Map<Integer, List<Reward>> rewardPools = new HashMap<>();
+    private final List<RewardGroup> defaultRewardGroups = new ArrayList<>();
+    private final Map<Integer, List<RewardGroup>> rewardPools = new HashMap<>();
     private String cycleTime = "04:30";
 
     public FishingConfig(JavaPlugin plugin) {
@@ -69,28 +69,47 @@ public class FishingConfig {
             plugin.getLogger().warning("quest-fishes 列表为空，渔夫任务将不会分配任何任务鱼。");
         }
 
-        defaultRewards.clear();
+        defaultRewardGroups.clear();
         rewardPools.clear();
         ConfigurationSection poolsSection = config.getConfigurationSection("reward-pools");
         if (poolsSection != null) {
             for (String key : poolsSection.getKeys(false)) {
-                List<Map<?, ?>> rewardMaps = poolsSection.getMapList(key);
-                List<Reward> rewards = new ArrayList<>();
-                for (Map<?, ?> rewardMap : rewardMaps) {
-                    rewards.add(parseReward(rewardMap));
+                List<Map<?, ?>> groupMaps = poolsSection.getMapList(key);
+                List<RewardGroup> groups = new ArrayList<>();
+                for (Map<?, ?> groupMap : groupMaps) {
+                    groups.add(parseRewardGroup(groupMap));
                 }
                 if ("default".equalsIgnoreCase(key)) {
-                    defaultRewards.addAll(rewards);
+                    defaultRewardGroups.addAll(groups);
                 } else {
                     try {
                         int count = Integer.parseInt(key);
-                        rewardPools.put(count, rewards);
+                        rewardPools.put(count, groups);
                     } catch (NumberFormatException e) {
                         plugin.getLogger().warning("reward-pools 中的键 " + key + " 不是整数也不是 default，已跳过。");
                     }
                 }
             }
         }
+    }
+
+    /**
+     * 解析一组奖励。兼容旧格式：直接写 command / ce-item-id 的单条奖励会作为默认权重的一组。
+     */
+    private RewardGroup parseRewardGroup(Map<?, ?> groupMap) {
+        Object rewardsObj = groupMap.get("rewards");
+        if (rewardsObj instanceof List<?> rewardList) {
+            int weight = parseInt(groupMap.get("weight"), 10);
+            List<Reward> rewards = new ArrayList<>();
+            for (Object rewardObj : rewardList) {
+                if (rewardObj instanceof Map<?, ?> rewardMap) {
+                    rewards.add(parseReward(rewardMap));
+                }
+            }
+            return new RewardGroup(weight, rewards);
+        }
+        // 旧格式：条目本身就是一条奖励
+        return new RewardGroup(10, List.of(parseReward(groupMap)));
     }
 
     private Reward parseReward(Map<?, ?> rewardMap) {
@@ -119,23 +138,23 @@ public class FishingConfig {
         return Collections.unmodifiableList(questFishes);
     }
 
-    public List<Reward> getDefaultRewards() {
-        return Collections.unmodifiableList(defaultRewards);
+    public List<RewardGroup> getDefaultRewardGroups() {
+        return Collections.unmodifiableList(defaultRewardGroups);
     }
 
-    public Map<Integer, List<Reward>> getRewardPools() {
+    public Map<Integer, List<RewardGroup>> getRewardPools() {
         return Collections.unmodifiableMap(rewardPools);
     }
 
     /**
-     * 根据累计完成次数获取对应奖池奖励。未配置特定次数时返回默认奖池。
+     * 根据累计完成次数获取对应奖池的多组奖励。未配置特定次数时返回默认奖池。
      */
-    public List<Reward> getRewardsForCompletion(int totalCompleted) {
-        List<Reward> pool = rewardPools.get(totalCompleted);
+    public List<RewardGroup> getRewardGroupsForCompletion(int totalCompleted) {
+        List<RewardGroup> pool = rewardPools.get(totalCompleted);
         if (pool != null && !pool.isEmpty()) {
             return Collections.unmodifiableList(pool);
         }
-        return Collections.unmodifiableList(defaultRewards);
+        return Collections.unmodifiableList(defaultRewardGroups);
     }
 
     public String getMessage(String key) {
@@ -170,5 +189,8 @@ public class FishingConfig {
         public boolean isItem() {
             return ceItemId != null && !ceItemId.isBlank();
         }
+    }
+
+    public record RewardGroup(int weight, List<Reward> rewards) {
     }
 }

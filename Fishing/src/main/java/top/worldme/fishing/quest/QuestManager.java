@@ -15,6 +15,7 @@ import org.bukkit.persistence.PersistentDataType;
 import top.worldme.fishing.config.FishingConfig;
 import top.worldme.fishing.config.FishingConfig.QuestFish;
 import top.worldme.fishing.config.FishingConfig.Reward;
+import top.worldme.fishing.config.FishingConfig.RewardGroup;
 import top.worldme.fishing.data.PlayerQuestData;
 import top.worldme.fishing.util.QuestKeys;
 
@@ -276,16 +277,47 @@ public class QuestManager {
         }
         inventory.setStorageContents(contents);
 
-        // 累计完成次数 +1，并根据次数选取奖池发放奖励
+        // 累计完成次数 +1，并根据次数选取奖池，按权重随机抽取一组奖励发放
         UUID uuid = player.getUniqueId();
         int newTotal = data.getTotalCompleted(uuid) + 1;
         data.setTotalCompleted(uuid, newTotal);
-        for (Reward reward : config.getRewardsForCompletion(newTotal)) {
-            giveReward(player, reward);
+        List<RewardGroup> groups = config.getRewardGroupsForCompletion(newTotal);
+        RewardGroup selected = selectWeighted(groups);
+        if (selected != null) {
+            for (Reward reward : selected.rewards()) {
+                giveReward(player, reward);
+            }
         }
 
         markCompleted(player);
         return true;
+    }
+
+    /**
+     * 按权重从多组奖励中随机抽取一组；权重都无效时返回第一组
+     */
+    private RewardGroup selectWeighted(List<RewardGroup> groups) {
+        if (groups == null || groups.isEmpty()) {
+            return null;
+        }
+        int totalWeight = 0;
+        for (RewardGroup group : groups) {
+            totalWeight += Math.max(0, group.weight());
+        }
+        if (totalWeight <= 0) {
+            return groups.get(0);
+        }
+        int roll = random.nextInt(totalWeight);
+        int current = 0;
+        RewardGroup selected = groups.get(0);
+        for (RewardGroup group : groups) {
+            current += Math.max(0, group.weight());
+            if (roll < current) {
+                selected = group;
+                break;
+            }
+        }
+        return selected;
     }
 
     private void giveReward(Player player, Reward reward) {

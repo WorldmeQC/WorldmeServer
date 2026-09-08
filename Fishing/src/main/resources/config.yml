@@ -33,22 +33,39 @@ quest-fishes:
       - "<gray>雨天出现几率更高"
 
 # 完成次数奖池
-# 玩家累计完成渔夫任务达到指定次数时，从对应奖池抽取奖励。
+# 玩家累计完成渔夫任务达到指定次数时，从对应奖池按权重随机抽取一组奖励发放。
 # 未配置特定次数时，使用 default 奖池。
+# 每个奖池包含多组奖励，每组有自己的 weight（权重越高被抽中几率越大），
+# 抽中一组后发放该组内的全部奖励。
 # 指令中 <player> 替换为玩家名，<uuid> 替换为玩家 UUID。
 reward-pools:
   default:
-    - command: "give <player> diamond 1"
-    - command: "eco give <player> 50"
+    - weight: 10
+      rewards:
+        - command: "give <player> diamond 1"
+        - command: "eco give <player> 50"
+    - weight: 3
+      rewards:
+        - command: "give <player> emerald 1"
+        - command: "eco give <player> 200"
 
   1:
-    - command: "give <player> diamond 5"
-    - command: "say <player> 完成了第一次渔夫任务！"
+    - weight: 1
+      rewards:
+        - command: "give <player> diamond 5"
+        - command: "say <player> 完成了第一次渔夫任务！"
 
   5:
-    - command: "give <player> emerald 3"
+    - weight: 5
+      rewards:
+        - command: "give <player> emerald 3"
+    - weight: 1
+      rewards:
+        - command: "give <player> netherite_ingot 1"
 
   10:
-    - command: "give <player> netherite_ingot 1"
-    - ce-item-id: "myitems:fisher_trophy"
-      amount: 1
+    - weight: 1
+      rewards:
+        - ce-item-id: "myitems:fisher_trophy"
+          amount: 1
+        - command: "eco give <player> 1000"
