@@ -10,7 +10,6 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/Accessories" />
-            <option value="$PROJECT_DIR$/AutoClear" />
             <option value="$PROJECT_DIR$/Fishing" />
             <option value="$PROJECT_DIR$/ItemSkin" />
             <option value="$PROJECT_DIR$/Trigger" />

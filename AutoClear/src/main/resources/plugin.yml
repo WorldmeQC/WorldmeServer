@@ -1,6 +1,0 @@
-name: Worldme-AutoClear
-version: 1.0.0
-main: top.worldme.AutoClear
-api-version: '26.2'
-author: WorldmeQC
-description: Worldme 服务器 自动清理插件
