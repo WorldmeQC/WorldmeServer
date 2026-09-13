@@ -1,0 +1,19 @@
+name: Worldme-Ownership
+version: 1.0.0
+main: top.worldme.Ownership
+api-version: '26.2'
+author: WorldmeQC
+description: Worldme 服务器 物品认主插件
+softdepend:
+  - Vault
+commands:
+  wmbind:
+    description: Worldme-Ownership 物品认主命令
+    aliases:
+      - wmb
+    usage: /wmbind [open <玩家> | unbind | reload]
+permissions:
+  worldme.ownership.use:
+    default: true
+  worldme.ownership.admin:
+    default: op

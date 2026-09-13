@@ -1,0 +1,46 @@
+# 认主价格（Vault 金币），一次性收费，整叠认主
+price: 1000.0
+
+# 解除认主价格（0 表示免费）
+unbind-price: 0.0
+
+# 是否整叠认主（true 时一次性认主整叠物品）
+bind-whole-stack: true
+
+# 死亡时是否保留认主物品（背包 + 装备栏）
+keep-on-death: true
+
+# 他人尝试拾取认主物品时是否提示
+notify-on-pickup-deny: true
+
+# 禁止认主的物品（Material 名称，大小写不敏感）
+blacklist: []
+
+# 按物品单独定价（Material 名称），未配置时使用上面的 price
+price-overrides: {}
+#  DIAMOND_SWORD: 500.0
+
+# 给认主物品追加主人信息的 lore
+lore:
+  enabled: true
+  lines:
+    - "<dark_gray>─────────────"
+    - "<gray>主人: <white>%owner%"
+
+messages:
+  prefix: "<gold>[认主] "
+  no-permission: "<red>你没有权限执行此命令。"
+  no-economy: "<red>经济系统未就绪，无法进行操作。"
+  player-only: "<red>该命令只能由玩家执行。"
+  cannot-bind-air: "<red>请把要认主的物品放入中间的槽位。"
+  not-enough-money: "<red>金币不足，认主需要 <yellow>%price%</yellow> 金币。"
+  success: "<green>认主成功！已花费 <yellow>%price%</yellow> 金币。"
+  already-owned: "<red>该物品已经认主。"
+  blacklisted: "<red>该物品无法认主。"
+  pickup-denied: "<red>这是 <white>%owner%</white> 的物品，你无法拾取。"
+  unbind-not-owned: "<red>该物品尚未认主。"
+  unbind-not-owner: "<red>你不是该物品的主人，无法解除认主。"
+  unbind-not-enough-money: "<red>金币不足，解除认主需要 <yellow>%price%</yellow> 金币。"
+  unbind-success: "<green>已解除认主。"
+  reloaded: "<green>配置已重载。"
+  player-not-found: "<red>找不到玩家：<white>%player%</white>。"
