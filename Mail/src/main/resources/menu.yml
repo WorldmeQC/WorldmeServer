@@ -1,0 +1,233 @@
+# ============ 邮箱 GUI ============
+title: "<gold><bold>我的邮箱"
+rows: 6
+items:
+  decoration:
+    # material 支持以 ce: 开头绑定 CraftEngine 物品，例如 "ce:myitems:mail_icon"
+    material: GRAY_STAINED_GLASS_PANE
+    name: " "
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 17
+      - 18
+      - 26
+      - 27
+      - 35
+      - 36
+      - 44
+      - 45
+      - 46
+      - 47
+      - 49
+      - 51
+      - 52
+
+  info:
+    slot: 4
+    material: BOOK
+    name: "<gold>我的邮箱"
+    lore:
+      - "<gray>当前邮件：<yellow>%count%</yellow> 封"
+      - "<gray>第 <yellow>%page%/%pages%</yellow> 页"
+      - "<gray>左键已读 ｜ 右键领取附件"
+      - "<dark_gray>邮件默认 %expire_days% 天后自动删除"
+
+  # 邮件展示区，点击交互
+  mail-slots:
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 19
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 28
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
+    - 37
+    - 38
+    - 39
+    - 40
+    - 41
+    - 42
+    - 43
+
+  # 邮件图标（未读/已读）
+  mail:
+    unread:
+      material: PAPER
+      name: "<yellow>%subject% <red>[未读]"
+    read:
+      material: BOOK
+      name: "<gray>%subject%"
+    lore:
+      - "<dark_gray>────────────────"
+      - "%content%"
+      - "<dark_gray>────────────────"
+      - "<gray>发送时间：<yellow>%sent_at%"
+      - "<gray>过期时间：<yellow>%expire_at%"
+      - ""
+      - "%attachment%"
+      - "<gray>左键已读 ｜ 右键领取附件"
+
+  empty:
+    slot: 22
+    material: BARRIER
+    name: "<gray>邮箱是空的"
+    lore:
+      - "<gray>系统邮件会出现在这里"
+
+  prev-button:
+    slot: 48
+    material: ARROW
+    name: "<gray>上一页"
+    lore:
+      - "<gray>点击查看上一页"
+
+  next-button:
+    slot: 50
+    material: ARROW
+    name: "<gray>下一页"
+    lore:
+      - "<gray>点击查看下一页"
+
+  close-button:
+    slot: 53
+    material: BARRIER
+    name: "<red>关闭"
+
+# ============ 写信 GUI ============
+compose:
+  title: "<gold><bold>写信"
+  rows: 6
+  items:
+    decoration:
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+      slots:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 5
+        - 6
+        - 7
+        - 8
+        - 9
+        - 12
+        - 17
+        - 18
+        - 26
+        - 27
+        - 35
+        - 36
+        - 37
+        - 38
+        - 39
+        - 40
+        - 41
+        - 42
+        - 43
+        - 44
+        - 46
+        - 47
+        - 48
+        - 49
+        - 50
+        - 51
+        - 52
+
+    info:
+      slot: 4
+      material: WRITABLE_BOOK
+      name: "<aqua>写信说明"
+      lore:
+        - "<gray>给目标玩家的邮箱发送邮件"
+        - "<gray>目标不需要在线"
+
+    # 主题输入格：放入有自定义名称的物品，其名称作为主题
+    subject:
+      slot: 10
+    subject-hint:
+      slot: 11
+      material: NAME_TAG
+      name: "<aqua>主题"
+      lore:
+        - "<gray>放入有自定义名称的物品"
+        - "<gray>其名称作为邮件主题"
+        - "<gray>不放则使用默认主题"
+
+    # 内容输入格：放入可编写书，页内容作为邮件正文
+    content:
+      slot: 13
+    content-hint:
+      slot: 14
+      material: WRITABLE_BOOK
+      name: "<aqua>邮件内容"
+      lore:
+        - "<gray>点击领取空白书到手上编辑"
+        - "<gray>编辑完成后放回此格"
+        - "<gray>书的页面内容作为邮件正文"
+
+    # 指令输入格：放入可编写书，每页一条指令
+    commands:
+      slot: 16
+    commands-hint:
+      slot: 15
+      material: WRITABLE_BOOK
+      name: "<aqua>附带指令"
+      lore:
+        - "<gray>放入可编写书，每页一条指令"
+        - "<gray>领取附件时以控制台执行"
+        - "<gray>支持 {player} / {uuid} 占位符"
+
+    # 附件物品区
+    attachments:
+      slots:
+        - 19
+        - 20
+        - 21
+        - 22
+        - 23
+        - 24
+        - 25
+        - 28
+        - 29
+        - 30
+        - 31
+        - 32
+        - 33
+        - 34
+
+    send-button:
+      slot: 45
+      material: EMERALD
+      name: "<green>发送"
+      lore:
+        - "<gray>发送到目标玩家的邮箱"
+
+    cancel-button:
+      slot: 53
+      material: BARRIER
+      name: "<red>取消"
+      lore:
+        - "<gray>退回所有放入的物品"

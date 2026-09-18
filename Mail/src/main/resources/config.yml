@@ -1,0 +1,30 @@
+# 邮件过期天数，过期后自动删除
+expire-days: 30
+
+# 写信时未指定主题时的默认主题
+default-subject: "系统邮件"
+
+# 过期邮件清理周期（秒）
+cleanup-interval: 600
+
+# 时间显示格式与时区
+date-format: "yyyy-MM-dd HH:mm"
+time-zone: "Asia/Shanghai"
+
+# 玩家上线时是否提醒未读邮件
+unread-reminder: true
+
+messages:
+  prefix: "<gold>[邮箱] "
+  unread-reminder: "<green>你有 <yellow>%count% <green>封未读邮件，输入 <yellow>/wmmail <green>查看。"
+  marked-read: "<green>已标记为已读。"
+  claimed: "<green>附件领取成功。"
+  already-claimed: "<red>该邮件的附件已领取。"
+  no-attachments: "<red>该邮件没有附件。"
+  inventory-full: "<red>背包空间不足，无法领取全部附件。"
+  mail-sent: "<green>邮件已发送给 <yellow>%player%<green>。"
+  mail-cleared: "<green>已清空 <yellow>%player%<green> 的邮箱，共 <yellow>%count% <green>封邮件。"
+  need-content: "<red>请放入一本写有内容的书作为邮件内容。"
+  no-permission: "<red>你没有权限执行此命令。"
+  player-not-found: "<red>找不到玩家：<white>%player%</white>。"
+  reloaded: "<green>配置已重载。"

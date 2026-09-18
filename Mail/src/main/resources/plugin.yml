@@ -1,0 +1,21 @@
+name: Worldme-Mail
+version: 1.0.0
+main: top.worldme.Mail
+api-version: '26.2'
+author: WorldmeQC
+description: Worldme 服务器 邮箱插件
+softdepend:
+  - CraftEngine
+commands:
+  wmmail:
+    description: Worldme-Mail 邮箱命令
+    aliases:
+      - wmm
+    usage: /wmmail [open <玩家> | send <玩家> | cmd <玩家> <主题> <指令...> | clear <玩家> | reload]
+permissions:
+  worldme.mail.use:
+    default: true
+    description: 允许使用邮箱
+  worldme.mail.admin:
+    default: op
+    description: 允许使用 Worldme-Mail 管理命令
