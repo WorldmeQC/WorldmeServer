@@ -1,0 +1,68 @@
+title: "<gold><bold>垃圾桶"
+rows: 4
+items:
+  decoration:
+    # material 支持以 ce: 开头绑定 CraftEngine 物品，例如 "ce:myitems:trash_icon"
+    material: GRAY_STAINED_GLASS_PANE
+    name: " "
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 17
+      - 27
+      - 28
+      - 29
+      - 30
+      - 31
+      - 32
+      - 33
+      - 34
+      - 35
+
+  # 放置垃圾物品的区域，点击可取回
+  content-slots:
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 19
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+
+  info:
+    slot: 4
+    material: BARREL
+    name: "<aqua>回收站"
+    lore:
+      - "<gray>这里保存着最近被清理的掉落物"
+      - "<gray>点击物品即可取回"
+      - "<gray>共 <yellow>%count%</yellow> 件物品"
+      - "<gray>第 <yellow>%page%/%pages%</yellow> 页"
+
+  prev-button:
+    slot: 18
+    material: ARROW
+    name: "<gray>上一页"
+    lore:
+      - "<gray>点击查看上一页"
+
+  next-button:
+    slot: 26
+    material: ARROW
+    name: "<gray>下一页"
+    lore:
+      - "<gray>点击查看下一页"

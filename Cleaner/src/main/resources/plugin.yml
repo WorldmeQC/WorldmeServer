@@ -1,0 +1,21 @@
+name: Worldme-Cleaner
+version: 1.0.0
+main: top.worldme.Cleaner
+api-version: '26.2'
+author: WorldmeQC
+description: Worldme 服务器 清理插件
+softdepend:
+  - CraftEngine
+commands:
+  wmcleaner:
+    description: Worldme-Cleaner 清理命令
+    aliases:
+      - wmc
+    usage: /wmcleaner [open <玩家> | cleartrash | reload]
+permissions:
+  worldme.cleaner.use:
+    default: true
+    description: 允许打开垃圾桶
+  worldme.cleaner.admin:
+    default: op
+    description: 允许使用 Worldme-Cleaner 管理命令

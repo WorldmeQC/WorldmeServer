@@ -1,0 +1,39 @@
+# 是否启用自动清理
+enabled: true
+
+# 清理周期（秒）
+interval: 300
+
+# 清理时是否将掉落物保存到全服垃圾桶
+trash-enabled: true
+
+# 垃圾桶容量上限（物品堆叠数），超过后按加入垃圾桶的时间淘汰最旧的物品
+trash-max-items: 54
+
+# 只清理指定世界，留空表示全部世界
+worlds: []
+
+# 倒计时提醒时间点（秒），在每个清理周期内提前提醒
+reminders:
+  - 180
+  - 120
+  - 60
+  - 30
+  - 20
+  - 10
+  - 5
+  - 4
+  - 3
+  - 2
+  - 1
+
+messages:
+  prefix: "<gold>[清理系统] "
+  countdown-min: "<red>地面掉落物将在 <white>%min% 分钟 <red>后清理，请及时拾取！"
+  countdown-sec: "<red>地面掉落物将在 <white>%sec% 秒 <red>后清理，请及时拾取！"
+  countdown-final: "<red>%sec% 秒后清理掉落物！"
+  cleared: "<green>已清理 <yellow>%count% <green>个掉落物！"
+  trash-cleared: "<green>已清空回收站，共 <yellow>%count% <green>件物品。"
+  reloaded: "<green>配置已重载。"
+  no-permission: "<red>你没有权限执行此命令。"
+  player-not-found: "<red>找不到玩家：<white>%player%</white>。"
