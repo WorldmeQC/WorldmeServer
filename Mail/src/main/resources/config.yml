@@ -16,7 +16,7 @@ unread-reminder: true
 
 messages:
   prefix: "<gold>[邮箱] "
-  unread-reminder: "<green>你有 <yellow>%count% <green>封未读邮件，输入 <yellow>/wmmail <green>查看。"
+  unread-reminder: "<green>你有 <yellow>%count% <green>封未读邮件，<click:run_command:/wmmail><hover:show_text:'<gold>点击打开邮箱'><yellow><bold>[查看邮箱]</bold></yellow></hover></click>"
   marked-read: "<green>已标记为已读。"
   claimed: "<green>附件领取成功。"
   already-claimed: "<red>该邮件的附件已领取。"
