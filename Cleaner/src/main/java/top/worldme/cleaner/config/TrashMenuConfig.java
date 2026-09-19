@@ -32,6 +32,19 @@ public class TrashMenuConfig {
     private ItemConfig nextButton = new ItemConfig();
     private int nextSlot = 26;
 
+    private ItemConfig prevButtonDisabled = item("GRAY_DYE", "<gray>上一页",
+            "<dark_gray>已经是第一页");
+    private ItemConfig nextButtonDisabled = item("GRAY_DYE", "<gray>下一页",
+            "<dark_gray>已经是最后一页");
+
+    private static ItemConfig item(String material, String name, String... lore) {
+        ItemConfig item = new ItemConfig();
+        item.material = material;
+        item.name = name;
+        item.lore.addAll(List.of(lore));
+        return item;
+    }
+
     public TrashMenuConfig(JavaPlugin plugin) {
         this.plugin = plugin;
         this.menuFile = new File(plugin.getDataFolder(), "menu.yml");
@@ -79,6 +92,16 @@ public class TrashMenuConfig {
         if (nextSection != null) {
             this.nextSlot = nextSection.getInt("slot", this.nextSlot);
             this.nextButton = readItemConfig(nextSection);
+        }
+
+        ConfigurationSection prevDisabledSection = items.getConfigurationSection("prev-button-disabled");
+        if (prevDisabledSection != null) {
+            this.prevButtonDisabled = readItemConfig(prevDisabledSection);
+        }
+
+        ConfigurationSection nextDisabledSection = items.getConfigurationSection("next-button-disabled");
+        if (nextDisabledSection != null) {
+            this.nextButtonDisabled = readItemConfig(nextDisabledSection);
         }
     }
 
@@ -133,6 +156,14 @@ public class TrashMenuConfig {
 
     public int nextSlot() {
         return nextSlot;
+    }
+
+    public ItemConfig prevButtonDisabled() {
+        return prevButtonDisabled;
+    }
+
+    public ItemConfig nextButtonDisabled() {
+        return nextButtonDisabled;
     }
 
     public static class ItemConfig {

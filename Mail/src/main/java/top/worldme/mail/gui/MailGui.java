@@ -87,13 +87,13 @@ public class MailGui implements InventoryHolder {
             inventory.setItem(menu.infoSlot(), info);
         }
 
-        ItemStack prev = buildItem(menu.prevButton(), null);
+        ItemStack prev = buildItem(page > 0 ? menu.prevButton() : menu.prevButtonDisabled(), null);
         if (prev != null && menu.prevSlot() >= 0 && menu.prevSlot() < inventory.getSize()) {
-            inventory.setItem(menu.prevSlot(), page > 0 ? prev : null);
+            inventory.setItem(menu.prevSlot(), prev);
         }
-        ItemStack next = buildItem(menu.nextButton(), null);
+        ItemStack next = buildItem(page < maxPage() ? menu.nextButton() : menu.nextButtonDisabled(), null);
         if (next != null && menu.nextSlot() >= 0 && menu.nextSlot() < inventory.getSize()) {
-            inventory.setItem(menu.nextSlot(), page < maxPage() ? next : null);
+            inventory.setItem(menu.nextSlot(), next);
         }
         ItemStack close = buildItem(menu.closeButton(), null);
         if (close != null && menu.closeSlot() >= 0 && menu.closeSlot() < inventory.getSize()) {
@@ -195,14 +195,22 @@ public class MailGui implements InventoryHolder {
             player.closeInventory();
             return;
         }
-        if (slot == menu.prevSlot() && page > 0) {
-            page--;
-            render();
+        if (slot == menu.prevSlot()) {
+            if (page > 0) {
+                page--;
+                render();
+            } else {
+                sendMessage("first-page", null);
+            }
             return;
         }
-        if (slot == menu.nextSlot() && page < maxPage()) {
-            page++;
-            render();
+        if (slot == menu.nextSlot()) {
+            if (page < maxPage()) {
+                page++;
+                render();
+            } else {
+                sendMessage("last-page", null);
+            }
             return;
         }
         int slotIndex = menu.mailSlots().indexOf(slot);

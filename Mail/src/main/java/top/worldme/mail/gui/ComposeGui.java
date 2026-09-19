@@ -1,10 +1,16 @@
 package top.worldme.mail.gui;
 
+import io.papermc.paper.dialog.Dialog;
+import io.papermc.paper.registry.data.dialog.ActionButton;
+import io.papermc.paper.registry.data.dialog.DialogBase;
+import io.papermc.paper.registry.data.dialog.action.DialogAction;
+import io.papermc.paper.registry.data.dialog.input.DialogInput;
+import io.papermc.paper.registry.data.dialog.input.TextDialogInput;
+import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,12 +20,12 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import top.worldme.mail.config.MailConfig;
 import top.worldme.mail.config.MailMenuConfig;
+import top.worldme.mail.config.MailMenuConfig.DialogConfig;
 import top.worldme.mail.config.MailMenuConfig.ItemConfig;
 import top.worldme.mail.manager.MailManager;
 import top.worldme.mail.util.ItemParser;
@@ -28,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class ComposeGui implements InventoryHolder {
 
@@ -39,7 +46,13 @@ public class ComposeGui implements InventoryHolder {
     private final UUID recipient;
     private final String recipientName;
     private final Inventory inventory;
+    private final boolean canUseCommands;
+
+    private String subject;
+    private String content;
+    private String commands;
     private boolean sent = false;
+    private final List<ItemStack> stashed = new ArrayList<>();
 
     public ComposeGui(JavaPlugin plugin, MailMenuConfig menu, MailConfig config, MailManager mailManager,
                       Player sender, UUID recipient, String recipientName) {
@@ -50,6 +63,7 @@ public class ComposeGui implements InventoryHolder {
         this.sender = sender;
         this.recipient = recipient;
         this.recipientName = recipientName;
+        this.canUseCommands = sender.hasPermission("worldme.mail.admin");
         this.inventory = Bukkit.createInventory(
                 this,
                 menu.composeSize(),
@@ -70,26 +84,29 @@ public class ComposeGui implements InventoryHolder {
             }
         }
 
-        ItemStack info = buildItem(menu.composeInfo(), Map.of("player", recipientName));
-        if (info != null && menu.composeInfoSlot() >= 0 && menu.composeInfoSlot() < inventory.getSize()) {
-            inventory.setItem(menu.composeInfoSlot(), info);
+        Map<String, String> placeholders = Map.of(
+                "player", recipientName,
+                "subject", displaySubject(),
+                "content_length", String.valueOf(contentLength()),
+                "command_count", String.valueOf(commandCount())
+        );
+
+        placeButton(menu.composeInfoSlot(), menu.composeInfo(), placeholders);
+        placeButton(menu.subjectButtonSlot(), menu.subjectButton(), placeholders);
+        placeButton(menu.contentButtonSlot(), menu.contentButton(), placeholders);
+
+        if (canUseCommands) {
+            placeButton(menu.commandsButtonSlot(), menu.commandsButton(), placeholders);
+        } else if (decoration != null) {
+            inventory.setItem(menu.commandsButtonSlot(), decoration.clone());
         }
 
-        placeHint(menu.subjectHintSlot(), menu.subjectHint(), null);
-        placeHint(menu.contentHintSlot(), menu.contentHint(), null);
-        placeHint(menu.commandsHintSlot(), menu.commandsHint(), null);
-
-        ItemStack send = buildItem(menu.sendButton(), null);
-        if (send != null && menu.sendSlot() >= 0 && menu.sendSlot() < inventory.getSize()) {
-            inventory.setItem(menu.sendSlot(), send);
-        }
-        ItemStack cancel = buildItem(menu.cancelButton(), null);
-        if (cancel != null && menu.cancelSlot() >= 0 && menu.cancelSlot() < inventory.getSize()) {
-            inventory.setItem(menu.cancelSlot(), cancel);
-        }
+        placeButton(menu.attachmentsHintSlot(), menu.attachmentsHint(), placeholders);
+        placeButton(menu.sendSlot(), menu.sendButton(), placeholders);
+        placeButton(menu.cancelSlot(), menu.cancelButton(), placeholders);
     }
 
-    private void placeHint(int slot, ItemConfig itemConfig, Map<String, String> placeholders) {
+    private void placeButton(int slot, ItemConfig itemConfig, Map<String, String> placeholders) {
         if (slot < 0 || slot >= inventory.getSize()) {
             return;
         }
@@ -100,40 +117,117 @@ public class ComposeGui implements InventoryHolder {
     }
 
     public boolean isInputSlot(int slot) {
-        if (slot == menu.subjectSlot() || slot == menu.contentSlot() || slot == menu.commandsSlot()) {
-            return true;
-        }
         return menu.attachmentSlots().contains(slot);
     }
 
-    private void handleHint(int slot) {
-        if (slot == menu.contentHintSlot() || slot == menu.commandsHintSlot()) {
-            Map<Integer, ItemStack> leftover = sender.getInventory().addItem(new ItemStack(Material.WRITABLE_BOOK));
-            for (ItemStack drop : leftover.values()) {
-                sender.getWorld().dropItemNaturally(sender.getLocation(), drop);
+    public boolean canUseCommands() {
+        return canUseCommands;
+    }
+
+    // ---------- 对话框输入 ----------
+
+    public void openSubjectDialog() {
+        showInputDialog(menu.subjectDialog(), "subject", subject, value -> this.subject = value);
+    }
+
+    public void openContentDialog() {
+        showInputDialog(menu.contentDialog(), "content", content, value -> this.content = value);
+    }
+
+    public void openCommandsDialog() {
+        if (!canUseCommands) {
+            return;
+        }
+        showInputDialog(menu.commandsDialog(), "commands", commands, value -> this.commands = value);
+    }
+
+    private void showInputDialog(DialogConfig dialogConfig, String key, String initial, Consumer<String> setter) {
+        stashAttachments();
+        TextDialogInput.MultilineOptions multiline = dialogConfig.multiline
+                ? TextDialogInput.MultilineOptions.create(
+                        dialogConfig.maxLines > 0 ? dialogConfig.maxLines : null,
+                        dialogConfig.height > 0 ? dialogConfig.height : null)
+                : null;
+        DialogInput input = DialogInput.text(
+                key,
+                dialogConfig.width,
+                mini(dialogConfig.label),
+                true,
+                initial == null ? "" : initial,
+                dialogConfig.maxLength,
+                multiline
+        );
+        Dialog dialog = Dialog.create(builder -> builder.empty()
+                .base(DialogBase.builder(mini(dialogConfig.title))
+                        .inputs(List.of(input))
+                        .canCloseWithEscape(false)
+                        .build())
+                .type(DialogType.confirmation(
+                        ActionButton.create(mini(dialogConfig.confirm), null, 100,
+                                DialogAction.customClick((response, audience) -> {
+                                    String value = response.getText(key);
+                                    setter.accept(value == null ? null : value.strip());
+                                    finishDialog();
+                                }, ClickCallback.Options.builder().uses(1).build())),
+                        ActionButton.create(mini(dialogConfig.cancel), null, 100,
+                                DialogAction.customClick((response, audience) -> finishDialog(),
+                                        ClickCallback.Options.builder().uses(1).build()))
+                )));
+        sender.showDialog(dialog);
+    }
+
+    private void finishDialog() {
+        restoreStashed();
+        render();
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (sender.isOnline()) {
+                sender.openInventory(inventory);
+            }
+        });
+    }
+
+    private void stashAttachments() {
+        for (int slot : menu.attachmentSlots()) {
+            ItemStack item = inventory.getItem(slot);
+            if (item != null && !item.getType().isAir()) {
+                stashed.add(item);
+                inventory.setItem(slot, null);
             }
         }
     }
 
+    private void restoreStashed() {
+        if (stashed.isEmpty()) {
+            return;
+        }
+        int index = 0;
+        for (int slot : menu.attachmentSlots()) {
+            if (index >= stashed.size()) {
+                break;
+            }
+            ItemStack current = inventory.getItem(slot);
+            if (current == null || current.getType().isAir()) {
+                inventory.setItem(slot, stashed.get(index++));
+            }
+        }
+        while (index < stashed.size()) {
+            giveToPlayer(stashed.get(index++));
+        }
+        stashed.clear();
+    }
+
+    // ---------- 发送 / 取消 ----------
+
     public void handleSend() {
-        ItemStack contentBook = inventory.getItem(menu.contentSlot());
-        String content = extractBookContent(contentBook);
-        if (content == null) {
+        String content = this.content;
+        if (content == null || content.isBlank()) {
             sendMessage("need-content", null);
             return;
         }
 
-        String subject = null;
-        ItemStack subjectItem = inventory.getItem(menu.subjectSlot());
-        if (subjectItem != null && !subjectItem.getType().isAir()) {
-            ItemMeta meta = subjectItem.getItemMeta();
-            if (meta != null && meta.hasDisplayName()) {
-                subject = PlainTextComponentSerializer.plainText().serialize(meta.displayName());
-            }
-        }
-        if (subject == null || subject.isBlank()) {
-            subject = config.defaultSubject();
-        }
+        String subject = (this.subject == null || this.subject.isBlank())
+                ? config.defaultSubject()
+                : this.subject;
 
         List<ItemStack> attachments = new ArrayList<>();
         for (int slot : menu.attachmentSlots()) {
@@ -142,8 +236,20 @@ public class ComposeGui implements InventoryHolder {
                 attachments.add(item.clone());
             }
         }
+        for (ItemStack item : stashed) {
+            attachments.add(item.clone());
+        }
+        stashed.clear();
 
-        List<String> commands = extractCommands(inventory.getItem(menu.commandsSlot()));
+        List<String> commands = new ArrayList<>();
+        if (canUseCommands && this.commands != null) {
+            for (String line : this.commands.split("\n")) {
+                String trimmed = line.strip();
+                if (!trimmed.isEmpty()) {
+                    commands.add(trimmed);
+                }
+            }
+        }
 
         mailManager.send(recipient, subject, content, attachments, commands);
 
@@ -153,87 +259,77 @@ public class ComposeGui implements InventoryHolder {
         sender.closeInventory();
     }
 
-    private void clearInputSlots() {
-        inventory.setItem(menu.subjectSlot(), null);
-        inventory.setItem(menu.contentSlot(), null);
-        inventory.setItem(menu.commandsSlot(), null);
-        for (int slot : menu.attachmentSlots()) {
-            inventory.setItem(slot, null);
-        }
-    }
-
     public void handleCancel() {
         returnItems();
         sender.closeInventory();
+    }
+
+    public void onClose() {
+        if (sent) {
+            return;
+        }
+        returnItems();
+    }
+
+    private void clearInputSlots() {
+        for (int slot : menu.attachmentSlots()) {
+            inventory.setItem(slot, null);
+        }
     }
 
     private void returnItems() {
         if (sent) {
             return;
         }
-        List<Integer> slots = new ArrayList<>();
-        slots.add(menu.subjectSlot());
-        slots.add(menu.contentSlot());
-        slots.add(menu.commandsSlot());
-        slots.addAll(menu.attachmentSlots());
-        for (int slot : slots) {
+        for (int slot : menu.attachmentSlots()) {
             ItemStack item = inventory.getItem(slot);
             if (item == null || item.getType().isAir()) {
                 continue;
             }
             inventory.setItem(slot, null);
-            Map<Integer, ItemStack> leftover = sender.getInventory().addItem(item);
-            for (ItemStack drop : leftover.values()) {
-                sender.getWorld().dropItemNaturally(sender.getLocation(), drop);
-            }
+            giveToPlayer(item);
+        }
+        for (ItemStack item : stashed) {
+            giveToPlayer(item);
+        }
+        stashed.clear();
+    }
+
+    private void giveToPlayer(ItemStack item) {
+        Map<Integer, ItemStack> leftover = sender.getInventory().addItem(item);
+        for (ItemStack drop : leftover.values()) {
+            sender.getWorld().dropItemNaturally(sender.getLocation(), drop);
         }
     }
 
-    private String extractBookContent(ItemStack book) {
-        if (book == null) {
-            return null;
+    // ---------- 占位符 / 物品 ----------
+
+    private String displaySubject() {
+        if (subject == null || subject.isBlank()) {
+            return "未设置";
         }
-        Material type = book.getType();
-        if (type != Material.WRITABLE_BOOK && type != Material.WRITTEN_BOOK) {
-            return null;
-        }
-        ItemMeta meta = book.getItemMeta();
-        if (!(meta instanceof BookMeta bookMeta)) {
-            return null;
-        }
-        List<String> pages = bookMeta.getPages();
-        StringBuilder sb = new StringBuilder();
-        for (String page : pages) {
-            if (sb.length() > 0) {
-                sb.append("\n");
-            }
-            sb.append(page);
-        }
-        if (sb.toString().isBlank()) {
-            return null;
-        }
-        return sb.toString();
+        return escape(subject);
     }
 
-    private List<String> extractCommands(ItemStack book) {
-        List<String> commands = new ArrayList<>();
-        if (book == null) {
-            return commands;
+    private int contentLength() {
+        return content == null ? 0 : content.length();
+    }
+
+    private int commandCount() {
+        if (commands == null || commands.isBlank()) {
+            return 0;
         }
-        Material type = book.getType();
-        if (type != Material.WRITABLE_BOOK && type != Material.WRITTEN_BOOK) {
-            return commands;
-        }
-        ItemMeta meta = book.getItemMeta();
-        if (meta instanceof BookMeta bookMeta) {
-            for (String page : bookMeta.getPages()) {
-                String line = page.strip();
-                if (!line.isEmpty()) {
-                    commands.add(line);
-                }
+        int count = 0;
+        for (String line : commands.split("\n")) {
+            if (!line.strip().isEmpty()) {
+                count++;
             }
         }
-        return commands;
+        return count;
+    }
+
+    private String escape(String text) {
+        return MiniMessage.miniMessage().escapeTags(text);
     }
 
     private void sendMessage(String key, Map<String, String> placeholders) {
@@ -242,6 +338,10 @@ public class ComposeGui implements InventoryHolder {
             return;
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize(config.getMessage("prefix") + text));
+    }
+
+    private Component mini(String text) {
+        return MiniMessage.miniMessage().deserialize(text == null ? "" : text);
     }
 
     private ItemStack buildItem(ItemConfig itemConfig, Map<String, String> placeholders) {
@@ -312,15 +412,19 @@ public class ComposeGui implements InventoryHolder {
                 int slot = event.getSlot();
                 if (gui.isInputSlot(slot)) {
                     event.setCancelled(false);
+                    return;
+                }
+                event.setCancelled(true);
+                if (slot == gui.menu.subjectButtonSlot()) {
+                    gui.openSubjectDialog();
+                } else if (slot == gui.menu.contentButtonSlot()) {
+                    gui.openContentDialog();
+                } else if (slot == gui.menu.commandsButtonSlot() && gui.canUseCommands()) {
+                    gui.openCommandsDialog();
                 } else if (slot == gui.menu.sendSlot()) {
-                    event.setCancelled(true);
                     gui.handleSend();
                 } else if (slot == gui.menu.cancelSlot()) {
-                    event.setCancelled(true);
                     gui.handleCancel();
-                } else {
-                    event.setCancelled(true);
-                    gui.handleHint(slot);
                 }
             } else {
                 event.setCancelled(false);
@@ -343,7 +447,7 @@ public class ComposeGui implements InventoryHolder {
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
             if (event.getInventory().getHolder() instanceof ComposeGui gui) {
-                gui.returnItems();
+                gui.onClose();
             }
         }
     }

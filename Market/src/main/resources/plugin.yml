@@ -1,0 +1,24 @@
+name: Worldme-Market
+version: 1.0.0
+main: top.worldme.Market
+api-version: '26.2'
+author: WorldmeQC
+description: Worldme 服务器 全球市场插件
+depend:
+  - Worldme-Mail
+  - Vault
+softdepend:
+  - CraftEngine
+commands:
+  wmmarket:
+    description: Worldme-Market 全球市场命令
+    aliases:
+      - wmmk
+    usage: /wmmarket [sell <价格> | open <玩家> | reload]
+permissions:
+  worldme.market.use:
+    default: true
+    description: 允许使用全球市场
+  worldme.market.admin:
+    default: op
+    description: 允许强制下架与使用管理命令

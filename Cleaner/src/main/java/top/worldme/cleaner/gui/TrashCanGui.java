@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import top.worldme.cleaner.config.CleanerConfig;
 import top.worldme.cleaner.config.TrashMenuConfig;
 import top.worldme.cleaner.config.TrashMenuConfig.ItemConfig;
 import top.worldme.cleaner.manager.ClearManager;
@@ -28,14 +29,17 @@ public class TrashCanGui implements InventoryHolder {
 
     private final JavaPlugin plugin;
     private final TrashMenuConfig menu;
+    private final CleanerConfig config;
     private final ClearManager clearManager;
     private final Player player;
     private final Inventory inventory;
     private int page = 0;
 
-    public TrashCanGui(JavaPlugin plugin, TrashMenuConfig menu, ClearManager clearManager, Player player) {
+    public TrashCanGui(JavaPlugin plugin, TrashMenuConfig menu, CleanerConfig config,
+                       ClearManager clearManager, Player player) {
         this.plugin = plugin;
         this.menu = menu;
+        this.config = config;
         this.clearManager = clearManager;
         this.player = player;
         this.inventory = Bukkit.createInventory(
@@ -76,13 +80,13 @@ public class TrashCanGui implements InventoryHolder {
             inventory.setItem(menu.infoSlot(), info);
         }
 
-        ItemStack prev = buildItem(menu.prevButton(), null);
+        ItemStack prev = buildItem(page > 0 ? menu.prevButton() : menu.prevButtonDisabled(), null);
         if (prev != null && menu.prevSlot() >= 0 && menu.prevSlot() < inventory.getSize()) {
-            inventory.setItem(menu.prevSlot(), page > 0 ? prev : null);
+            inventory.setItem(menu.prevSlot(), prev);
         }
-        ItemStack next = buildItem(menu.nextButton(), null);
+        ItemStack next = buildItem(page < maxPage() ? menu.nextButton() : menu.nextButtonDisabled(), null);
         if (next != null && menu.nextSlot() >= 0 && menu.nextSlot() < inventory.getSize()) {
-            inventory.setItem(menu.nextSlot(), page < maxPage() ? next : null);
+            inventory.setItem(menu.nextSlot(), next);
         }
 
         List<TrashEntry> trash = clearManager.getTrash();
@@ -101,14 +105,22 @@ public class TrashCanGui implements InventoryHolder {
     }
 
     public void handleClick(int slot) {
-        if (slot == menu.prevSlot() && page > 0) {
-            page--;
-            render();
+        if (slot == menu.prevSlot()) {
+            if (page > 0) {
+                page--;
+                render();
+            } else {
+                sendMessage("first-page");
+            }
             return;
         }
-        if (slot == menu.nextSlot() && page < maxPage()) {
-            page++;
-            render();
+        if (slot == menu.nextSlot()) {
+            if (page < maxPage()) {
+                page++;
+                render();
+            } else {
+                sendMessage("last-page");
+            }
             return;
         }
         if (!menu.contentSlots().contains(slot)) {
@@ -125,6 +137,14 @@ public class TrashCanGui implements InventoryHolder {
             }
             render();
         }
+    }
+
+    private void sendMessage(String key) {
+        String text = config.getMessage(key);
+        if (text == null || text.isEmpty()) {
+            return;
+        }
+        player.sendMessage(MiniMessage.miniMessage().deserialize(config.getMessage("prefix") + text));
     }
 
     private ItemStack buildItem(ItemConfig itemConfig, Map<String, String> placeholders) {

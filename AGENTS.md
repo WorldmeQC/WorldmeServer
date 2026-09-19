@@ -19,6 +19,10 @@ Each subproject builds one independent plugin JAR.
 | Accessories | Worldme-Accessories| `net.momirealms:craft-engine-core:26.7.4`        | Soft-depends on `CraftEngine`.            |
 | ItemSkin    | Worldme-ItemSkin   | `net.momirealms:craft-engine-bukkit:26.7.4`      | Soft-depends on `CraftEngine`.            |
 | Fishing     | Worldme-Fishing    | `net.momirealms:custom-fishing:2.3.24`, `net.momirealms:craft-engine-core:26.7.4`, `net.momirealms:craft-engine-bukkit:26.7.4` | Soft-depends on `CustomFishing` and `CraftEngine`. Command `/wmfishing` (alias `/wmf`), `/wmfishing open <player>` for NPCs. |
+| Cleaner     | Worldme-Cleaner    | `net.momirealms:craft-engine-core:26.7.4`, `net.momirealms:craft-engine-bukkit:26.7.4` | Soft-depends on `CraftEngine`. Trash GUI command `/wmcleaner` (alias `/wmc`). |
+| Mail        | Worldme-Mail       | `org.xerial:sqlite-jdbc:3.47.1.0` (shaded), `craft-engine-core/bukkit:26.7.4` | Soft-depends on `CraftEngine`. Command `/wmmail` (alias `/wmm`). Exposes `MailApi` via `getApi()` for other modules. |
+| Ownership   | Worldme-Ownership   | `com.github.MilkBowl:VaultAPI:1.7.1`              | Soft-depends on `Vault`. Command `/wmbind` (alias `/wmb`). |
+| Market      | Worldme-Market     | `org.xerial:sqlite-jdbc:3.47.1.0` (shaded), `com.github.MilkBowl:VaultAPI:1.7.1`, `craft-engine-core/bukkit:26.7.4` | Depends on `Worldme-Mail` and `Vault`; soft-depends on `CraftEngine`. Command `/wmmarket` (alias `/wmmk`). Calls the Mail API reflectively and delivers sales/expiry items by mail. |
 
 ## Build commands
 

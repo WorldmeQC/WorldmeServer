@@ -34,6 +34,8 @@ messages:
   countdown-final: "<red>%sec% 秒后清理掉落物！"
   cleared: "<green>已清理 <yellow>%count% <green>个掉落物！"
   trash-cleared: "<green>已清空回收站，共 <yellow>%count% <green>件物品。"
+  first-page: "<gray>已经是第一页了。"
+  last-page: "<gray>已经是最后一页了。"
   reloaded: "<green>配置已重载。"
   no-permission: "<red>你没有权限执行此命令。"
   player-not-found: "<red>找不到玩家：<white>%player%</white>。"

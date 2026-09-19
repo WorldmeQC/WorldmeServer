@@ -103,6 +103,13 @@ items:
     lore:
       - "<gray>点击查看上一页"
 
+  # 不可翻页时显示的按钮（slot 沿用 prev-button），支持 ce: 物品
+  prev-button-disabled:
+    material: GRAY_DYE
+    name: "<gray>上一页"
+    lore:
+      - "<dark_gray>已经是第一页"
+
   next-button:
     slot: 50
     material: ARROW
@@ -110,12 +117,25 @@ items:
     lore:
       - "<gray>点击查看下一页"
 
+  # 不可翻页时显示的按钮（slot 沿用 next-button），支持 ce: 物品
+  next-button-disabled:
+    material: GRAY_DYE
+    name: "<gray>下一页"
+    lore:
+      - "<dark_gray>已经是最后一页"
+
   close-button:
     slot: 53
     material: BARRIER
     name: "<red>关闭"
 
 # ============ 写信 GUI ============
+# 布局说明（6 行）：
+#   [ 4] 说明
+#   [11] 主题按钮    [13] 正文按钮    [15] 指令按钮（仅管理员可见）
+#   [18] 附件区标题  [19-25] 附件格
+#   [28-34] 附件格
+#   [45] 发送        [53] 取消
 compose:
   title: "<gold><bold>写信"
   rows: 6
@@ -133,9 +153,11 @@ compose:
         - 7
         - 8
         - 9
+        - 10
         - 12
+        - 14
+        - 16
         - 17
-        - 18
         - 26
         - 27
         - 35
@@ -159,48 +181,57 @@ compose:
     info:
       slot: 4
       material: WRITABLE_BOOK
-      name: "<aqua>写信说明"
+      name: "<aqua>写信给 %player%"
       lore:
-        - "<gray>给目标玩家的邮箱发送邮件"
-        - "<gray>目标不需要在线"
+        - "<gray>点击下方按钮填写主题与正文"
+        - "<gray>正文为空则无法发送"
+        - ""
+        - "<gray>主题：<yellow>%subject%"
+        - "<gray>正文字数：<yellow>%content_length%"
 
-    # 主题输入格：放入有自定义名称的物品，其名称作为主题
-    subject:
-      slot: 10
-    subject-hint:
+    # 主题按钮：点击弹出对话框输入主题
+    subject-button:
       slot: 11
       material: NAME_TAG
       name: "<aqua>主题"
       lore:
-        - "<gray>放入有自定义名称的物品"
-        - "<gray>其名称作为邮件主题"
-        - "<gray>不放则使用默认主题"
+        - "<gray>点击输入邮件主题"
+        - ""
+        - "<gray>当前：<yellow>%subject%"
 
-    # 内容输入格：放入可编写书，页内容作为邮件正文
-    content:
+    # 正文按钮：点击弹出对话框输入正文（可多行）
+    content-button:
       slot: 13
-    content-hint:
-      slot: 14
       material: WRITABLE_BOOK
-      name: "<aqua>邮件内容"
+      name: "<aqua>正文"
       lore:
-        - "<gray>点击领取空白书到手上编辑"
-        - "<gray>编辑完成后放回此格"
-        - "<gray>书的页面内容作为邮件正文"
+        - "<gray>点击输入邮件正文"
+        - "<gray>支持多行文本"
+        - ""
+        - "<gray>当前字数：<yellow>%content_length%"
 
-    # 指令输入格：放入可编写书，每页一条指令
-    commands:
-      slot: 16
-    commands-hint:
+    # 指令按钮：仅拥有 worldme.mail.admin 的玩家可见
+    commands-button:
       slot: 15
-      material: WRITABLE_BOOK
-      name: "<aqua>附带指令"
+      material: COMMAND_BLOCK
+      name: "<red>附带指令（管理员）"
       lore:
-        - "<gray>放入可编写书，每页一条指令"
-        - "<gray>领取附件时以控制台执行"
+        - "<gray>点击输入要附带执行的指令"
+        - "<gray>每行一条，领取附件时以控制台执行"
         - "<gray>支持 {player} / {uuid} 占位符"
+        - ""
+        - "<gray>当前指令数：<yellow>%command_count%"
 
-    # 附件物品区
+    # 附件区标题，附件格在其下方
+    attachments-hint:
+      slot: 18
+      material: CHEST
+      name: "<aqua>附件物品"
+      lore:
+        - "<gray>把要寄送的物品放入下方格子"
+        - "<gray>背包空间不足时无法领取"
+
+    # 附件物品区（玩家只能放入自己背包中的物品）
     attachments:
       slots:
         - 19
@@ -223,7 +254,7 @@ compose:
       material: EMERALD
       name: "<green>发送"
       lore:
-        - "<gray>发送到目标玩家的邮箱"
+        - "<gray>发送到 %player% 的邮箱"
 
     cancel-button:
       slot: 53
@@ -231,3 +262,35 @@ compose:
       name: "<red>取消"
       lore:
         - "<gray>退回所有放入的物品"
+
+  # 点击主题/正文/指令弹出的对话框配置
+  # max-lines 为 0 表示不限制行数
+  dialogs:
+    subject:
+      title: "<gold>设置邮件主题"
+      label: "<gray>主题"
+      confirm: "<green>确定"
+      cancel: "<red>取消"
+      width: 300
+      max-length: 64
+      multiline: false
+    content:
+      title: "<gold>编辑邮件正文"
+      label: "<gray>正文（可多行）"
+      confirm: "<green>确定"
+      cancel: "<red>取消"
+      width: 400
+      max-length: 2000
+      multiline: true
+      height: 160
+      max-lines: 50
+    commands:
+      title: "<gold>编辑附带指令（管理员）"
+      label: "<gray>每行一条指令，支持 {player} / {uuid}"
+      confirm: "<green>确定"
+      cancel: "<red>取消"
+      width: 400
+      max-length: 2000
+      multiline: true
+      height: 160
+      max-lines: 50

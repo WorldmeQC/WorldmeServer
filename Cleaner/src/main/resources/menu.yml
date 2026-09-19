@@ -60,9 +60,23 @@ items:
     lore:
       - "<gray>点击查看上一页"
 
+  # 不可翻页时显示的按钮（slot 沿用 prev-button），支持 ce: 物品
+  prev-button-disabled:
+    material: GRAY_DYE
+    name: "<gray>上一页"
+    lore:
+      - "<dark_gray>已经是第一页"
+
   next-button:
     slot: 26
     material: ARROW
     name: "<gray>下一页"
     lore:
       - "<gray>点击查看下一页"
+
+  # 不可翻页时显示的按钮（slot 沿用 next-button），支持 ce: 物品
+  next-button-disabled:
+    material: GRAY_DYE
+    name: "<gray>下一页"
+    lore:
+      - "<dark_gray>已经是最后一页"

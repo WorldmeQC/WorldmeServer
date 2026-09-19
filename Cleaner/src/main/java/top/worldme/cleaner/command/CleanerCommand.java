@@ -101,7 +101,7 @@ public class CleanerCommand implements CommandExecutor, TabCompleter {
     }
 
     public void openMenu(Player player) {
-        TrashCanGui gui = new TrashCanGui(plugin, menuConfig, clearManager, player);
+        TrashCanGui gui = new TrashCanGui(plugin, menuConfig, config, clearManager, player);
         player.openInventory(gui.getInventory());
     }
 

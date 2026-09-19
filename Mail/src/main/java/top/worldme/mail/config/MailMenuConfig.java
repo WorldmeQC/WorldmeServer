@@ -32,6 +32,10 @@ public class MailMenuConfig {
     private int prevSlot = 48;
     private ItemConfig nextButton = new ItemConfig();
     private int nextSlot = 50;
+    private ItemConfig prevButtonDisabled = item("GRAY_DYE", "<gray>上一页",
+            "<dark_gray>已经是第一页");
+    private ItemConfig nextButtonDisabled = item("GRAY_DYE", "<gray>下一页",
+            "<dark_gray>已经是最后一页");
     private ItemConfig closeButton = new ItemConfig();
     private int closeSlot = 53;
 
@@ -42,20 +46,55 @@ public class MailMenuConfig {
     private final List<Integer> composeDecorationSlots = new ArrayList<>();
     private ItemConfig composeInfo = new ItemConfig();
     private int composeInfoSlot = 4;
-    private int subjectSlot = 10;
-    private ItemConfig subjectHint = new ItemConfig();
-    private int subjectHintSlot = 11;
-    private int contentSlot = 13;
-    private ItemConfig contentHint = new ItemConfig();
-    private int contentHintSlot = 14;
-    private int commandsSlot = 16;
-    private ItemConfig commandsHint = new ItemConfig();
-    private int commandsHintSlot = 15;
+    private ItemConfig subjectButton = item("NAME_TAG", "<aqua>主题",
+            "<gray>点击输入邮件主题", "", "<gray>当前：<yellow>%subject%");
+    private int subjectButtonSlot = 11;
+    private ItemConfig contentButton = item("WRITABLE_BOOK", "<aqua>正文",
+            "<gray>点击输入邮件正文", "<gray>支持多行文本", "", "<gray>当前字数：<yellow>%content_length%");
+    private int contentButtonSlot = 13;
+    private ItemConfig commandsButton = item("COMMAND_BLOCK", "<red>附带指令（管理员）",
+            "<gray>点击输入要附带执行的指令", "<gray>每行一条，领取附件时以控制台执行",
+            "<gray>支持 {player} / {uuid} 占位符", "", "<gray>当前指令数：<yellow>%command_count%");
+    private int commandsButtonSlot = 15;
+    private ItemConfig attachmentsHint = item("CHEST", "<aqua>附件物品",
+            "<gray>把要寄送的物品放入下方格子", "<gray>背包空间不足时无法领取");
+    private int attachmentsHintSlot = 18;
     private final List<Integer> attachmentSlots = new ArrayList<>();
     private ItemConfig sendButton = new ItemConfig();
     private int sendSlot = 45;
     private ItemConfig cancelButton = new ItemConfig();
     private int cancelSlot = 53;
+
+    // ---------- 写信 Dialog ----------
+    private final DialogConfig subjectDialog = dialog(
+            "<gold>设置邮件主题", "<gray>主题", 300, 64, false, 0, 0);
+    private final DialogConfig contentDialog = dialog(
+            "<gold>编辑邮件正文", "<gray>正文（可多行，Shift+Enter 换行）", 400, 2000, true, 160, 50);
+    private final DialogConfig commandsDialog = dialog(
+            "<gold>编辑附带指令（管理员）", "<gray>每行一条指令，支持 {player} / {uuid}", 400, 2000, true, 160, 50);
+
+    private static ItemConfig item(String material, String name, String... lore) {
+        ItemConfig item = new ItemConfig();
+        item.material = material;
+        item.name = name;
+        item.lore.addAll(List.of(lore));
+        return item;
+    }
+
+    private static DialogConfig dialog(String title, String label, int width, int maxLength,
+                                       boolean multiline, int height, int maxLines) {
+        DialogConfig dialog = new DialogConfig();
+        dialog.title = title;
+        dialog.label = label;
+        dialog.confirm = "<green>确定";
+        dialog.cancel = "<red>取消";
+        dialog.width = width;
+        dialog.maxLength = maxLength;
+        dialog.multiline = multiline;
+        dialog.height = height;
+        dialog.maxLines = maxLines;
+        return dialog;
+    }
 
     public MailMenuConfig(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -122,6 +161,16 @@ public class MailMenuConfig {
                 this.nextButton = readItemConfig(next);
             }
 
+            ConfigurationSection prevDisabled = items.getConfigurationSection("prev-button-disabled");
+            if (prevDisabled != null) {
+                this.prevButtonDisabled = readItemConfig(prevDisabled);
+            }
+
+            ConfigurationSection nextDisabled = items.getConfigurationSection("next-button-disabled");
+            if (nextDisabled != null) {
+                this.nextButtonDisabled = readItemConfig(nextDisabled);
+            }
+
             ConfigurationSection close = items.getConfigurationSection("close-button");
             if (close != null) {
                 this.closeSlot = close.getInt("slot", this.closeSlot);
@@ -148,34 +197,28 @@ public class MailMenuConfig {
                     this.composeInfo = readItemConfig(infoSection);
                 }
 
-                ConfigurationSection subject = cItems.getConfigurationSection("subject");
+                ConfigurationSection subject = cItems.getConfigurationSection("subject-button");
                 if (subject != null) {
-                    this.subjectSlot = subject.getInt("slot", this.subjectSlot);
-                }
-                ConfigurationSection subjectHintSection = cItems.getConfigurationSection("subject-hint");
-                if (subjectHintSection != null) {
-                    this.subjectHintSlot = subjectHintSection.getInt("slot", this.subjectHintSlot);
-                    this.subjectHint = readItemConfig(subjectHintSection);
+                    this.subjectButtonSlot = subject.getInt("slot", this.subjectButtonSlot);
+                    this.subjectButton = readItemConfig(subject);
                 }
 
-                ConfigurationSection content = cItems.getConfigurationSection("content");
+                ConfigurationSection content = cItems.getConfigurationSection("content-button");
                 if (content != null) {
-                    this.contentSlot = content.getInt("slot", this.contentSlot);
-                }
-                ConfigurationSection contentHintSection = cItems.getConfigurationSection("content-hint");
-                if (contentHintSection != null) {
-                    this.contentHintSlot = contentHintSection.getInt("slot", this.contentHintSlot);
-                    this.contentHint = readItemConfig(contentHintSection);
+                    this.contentButtonSlot = content.getInt("slot", this.contentButtonSlot);
+                    this.contentButton = readItemConfig(content);
                 }
 
-                ConfigurationSection commands = cItems.getConfigurationSection("commands");
+                ConfigurationSection commands = cItems.getConfigurationSection("commands-button");
                 if (commands != null) {
-                    this.commandsSlot = commands.getInt("slot", this.commandsSlot);
+                    this.commandsButtonSlot = commands.getInt("slot", this.commandsButtonSlot);
+                    this.commandsButton = readItemConfig(commands);
                 }
-                ConfigurationSection commandsHintSection = cItems.getConfigurationSection("commands-hint");
-                if (commandsHintSection != null) {
-                    this.commandsHintSlot = commandsHintSection.getInt("slot", this.commandsHintSlot);
-                    this.commandsHint = readItemConfig(commandsHintSection);
+
+                ConfigurationSection attachmentsHintSection = cItems.getConfigurationSection("attachments-hint");
+                if (attachmentsHintSection != null) {
+                    this.attachmentsHintSlot = attachmentsHintSection.getInt("slot", this.attachmentsHintSlot);
+                    this.attachmentsHint = readItemConfig(attachmentsHintSection);
                 }
 
                 ConfigurationSection attachments = cItems.getConfigurationSection("attachments");
@@ -196,7 +239,29 @@ public class MailMenuConfig {
                     this.cancelButton = readItemConfig(cancel);
                 }
             }
+
+            ConfigurationSection dialogs = compose.getConfigurationSection("dialogs");
+            if (dialogs != null) {
+                readDialog(dialogs.getConfigurationSection("subject"), this.subjectDialog);
+                readDialog(dialogs.getConfigurationSection("content"), this.contentDialog);
+                readDialog(dialogs.getConfigurationSection("commands"), this.commandsDialog);
+            }
         }
+    }
+
+    private void readDialog(ConfigurationSection section, DialogConfig dialog) {
+        if (section == null) {
+            return;
+        }
+        dialog.title = section.getString("title", dialog.title);
+        dialog.label = section.getString("label", dialog.label);
+        dialog.confirm = section.getString("confirm", dialog.confirm);
+        dialog.cancel = section.getString("cancel", dialog.cancel);
+        dialog.width = section.getInt("width", dialog.width);
+        dialog.maxLength = Math.max(1, section.getInt("max-length", dialog.maxLength));
+        dialog.multiline = section.getBoolean("multiline", dialog.multiline);
+        dialog.height = section.getInt("height", dialog.height);
+        dialog.maxLines = Math.max(0, section.getInt("max-lines", dialog.maxLines));
     }
 
     private int clampRows(int value) {
@@ -277,6 +342,14 @@ public class MailMenuConfig {
         return nextSlot;
     }
 
+    public ItemConfig prevButtonDisabled() {
+        return prevButtonDisabled;
+    }
+
+    public ItemConfig nextButtonDisabled() {
+        return nextButtonDisabled;
+    }
+
     public ItemConfig closeButton() {
         return closeButton;
     }
@@ -310,44 +383,52 @@ public class MailMenuConfig {
         return composeInfoSlot;
     }
 
-    public int subjectSlot() {
-        return subjectSlot;
+    public ItemConfig subjectButton() {
+        return subjectButton;
     }
 
-    public ItemConfig subjectHint() {
-        return subjectHint;
+    public int subjectButtonSlot() {
+        return subjectButtonSlot;
     }
 
-    public int subjectHintSlot() {
-        return subjectHintSlot;
+    public ItemConfig contentButton() {
+        return contentButton;
     }
 
-    public int contentSlot() {
-        return contentSlot;
+    public int contentButtonSlot() {
+        return contentButtonSlot;
     }
 
-    public ItemConfig contentHint() {
-        return contentHint;
+    public ItemConfig commandsButton() {
+        return commandsButton;
     }
 
-    public int contentHintSlot() {
-        return contentHintSlot;
+    public int commandsButtonSlot() {
+        return commandsButtonSlot;
     }
 
-    public int commandsSlot() {
-        return commandsSlot;
+    public ItemConfig attachmentsHint() {
+        return attachmentsHint;
     }
 
-    public ItemConfig commandsHint() {
-        return commandsHint;
-    }
-
-    public int commandsHintSlot() {
-        return commandsHintSlot;
+    public int attachmentsHintSlot() {
+        return attachmentsHintSlot;
     }
 
     public List<Integer> attachmentSlots() {
         return Collections.unmodifiableList(attachmentSlots);
+    }
+
+    public DialogConfig subjectDialog() {
+        return subjectDialog;
+    }
+
+    public DialogConfig contentDialog() {
+        return contentDialog;
+    }
+
+    public DialogConfig commandsDialog() {
+        return commandsDialog;
     }
 
     public ItemConfig sendButton() {
@@ -370,5 +451,17 @@ public class MailMenuConfig {
         public String material;
         public String name;
         public final List<String> lore = new ArrayList<>();
+    }
+
+    public static class DialogConfig {
+        public String title;
+        public String label;
+        public String confirm;
+        public String cancel;
+        public int width;
+        public int maxLength;
+        public boolean multiline;
+        public int height;
+        public int maxLines;
     }
 }

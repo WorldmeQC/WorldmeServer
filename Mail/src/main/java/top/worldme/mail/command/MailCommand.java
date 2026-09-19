@@ -71,7 +71,7 @@ public class MailCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             case "send" -> {
-                if (!hasAdmin(sender)) {
+                if (!hasSend(sender)) {
                     send(sender, "no-permission", null);
                     return true;
                 }
@@ -182,6 +182,13 @@ public class MailCommand implements CommandExecutor, TabCompleter {
         return sender.hasPermission("worldme.mail.use") || !(sender instanceof Player);
     }
 
+    private boolean hasSend(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            return true;
+        }
+        return sender.hasPermission("worldme.mail.send") || sender.hasPermission("worldme.mail.admin");
+    }
+
     private void send(CommandSender sender, String key, Map<String, String> placeholders) {
         String text = config.getMessage(key, placeholders);
         if (text == null || text.isEmpty()) {
@@ -193,13 +200,21 @@ public class MailCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
-            if (hasAdmin(sender)) {
-                return Arrays.asList("open", "send", "cmd", "clear", "reload");
+            List<String> subcommands = new ArrayList<>();
+            if (hasSend(sender)) {
+                subcommands.add("send");
             }
-            return Collections.emptyList();
+            if (hasAdmin(sender)) {
+                subcommands.addAll(Arrays.asList("open", "cmd", "clear", "reload"));
+            }
+            return subcommands;
         }
-        if (args.length == 2 && hasAdmin(sender)) {
-            return Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
+        if (args.length == 2) {
+            String sub = args[0].toLowerCase();
+            if (("send".equals(sub) && hasSend(sender)) || (hasAdmin(sender) && (
+                    "open".equals(sub) || "cmd".equals(sub) || "clear".equals(sub)))) {
+                return Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
+            }
         }
         return Collections.emptyList();
     }

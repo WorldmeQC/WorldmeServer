@@ -16,6 +16,9 @@ permissions:
   worldme.mail.use:
     default: true
     description: 允许使用邮箱
+  worldme.mail.send:
+    default: true
+    description: 允许写信发送邮件
   worldme.mail.admin:
     default: op
-    description: 允许使用 Worldme-Mail 管理命令
+    description: 允许附带指令及使用 Worldme-Mail 管理命令
