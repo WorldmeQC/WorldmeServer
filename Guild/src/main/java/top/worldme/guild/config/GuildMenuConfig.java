@@ -55,6 +55,17 @@ public class GuildMenuConfig {
     public int membersBackSlot = 49;
     public ItemConfig membersBack = item("ARROW", "<gray>返回公会界面");
 
+    public String warehouseTitle = "<dark_gray>公会仓库";
+    public int warehouseRows = 6;
+    public final List<Integer> warehouseContentSlots = new ArrayList<>(List.of(
+            0, 1, 2, 3, 4, 5, 6, 7, 8,
+            9, 10, 11, 12, 13, 14, 15, 16, 17,
+            18, 19, 20, 21, 22, 23, 24, 25, 26,
+            27, 28, 29, 30, 31, 32, 33, 34, 35,
+            36, 37, 38, 39, 40, 41, 42, 43, 44));
+    public int warehouseCloseSlot = 49;
+    public ItemConfig warehouseClose = item("BARRIER", "<red>关闭并保存");
+
     public DialogConfig createDialog = dialog("<gold>创建公会", "<gray>公会名称", 300, 16);
     public DialogConfig joinDialog = dialog("<gold>加入公会", "<gray>公会名称", 300, 16);
     public DialogConfig amountDialog = dialog("<gold>输入金额", "<gray>金额", 300, 12);
@@ -125,6 +136,19 @@ public class GuildMenuConfig {
                 this.membersBackSlot = readItemSlot(items, "back", this.membersBackSlot);
                 this.membersBack = readItemIfPresent(items, "back", this.membersBack);
             }
+        }
+
+        ConfigurationSection warehouse = config.getConfigurationSection("warehouse");
+        if (warehouse != null) {
+            this.warehouseTitle = warehouse.getString("title", this.warehouseTitle);
+            this.warehouseRows = clampRows(warehouse.getInt("rows", this.warehouseRows));
+            List<Integer> slots = warehouse.getIntegerList("content-slots");
+            if (!slots.isEmpty()) {
+                this.warehouseContentSlots.clear();
+                this.warehouseContentSlots.addAll(slots);
+            }
+            this.warehouseCloseSlot = warehouse.getInt("close-slot", this.warehouseCloseSlot);
+            this.warehouseClose = readItemIfPresent(warehouse, "close", this.warehouseClose);
         }
 
         ConfigurationSection dialogs = config.getConfigurationSection("dialogs");

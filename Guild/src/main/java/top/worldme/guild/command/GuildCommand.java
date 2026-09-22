@@ -10,11 +10,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import top.worldme.Guild;
+import top.worldme.guild.config.FeatureDefinition;
 import top.worldme.guild.config.GuildConfig;
+import top.worldme.guild.data.Guild;
+import top.worldme.guild.data.GuildFeature;
 import top.worldme.guild.data.GuildFundRequest;
 import top.worldme.guild.data.GuildMember;
 import top.worldme.guild.data.GuildRank;
+import top.worldme.guild.feature.GuildFeatureProvider;
 import top.worldme.guild.gui.GuildMenu;
 import top.worldme.guild.manager.GuildManager;
 import top.worldme.guild.manager.GuildManager.GuildResult;
@@ -32,13 +35,13 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
     private static final List<String> SUBCOMMANDS = List.of(
             "create", "info", "join", "cancel", "accept", "reject", "invite", "kick", "rank",
             "leave", "disband", "deposit", "withdraw", "request", "fundapprove", "fundreject",
-            "fee", "openjoin", "upgrade", "tp", "open", "reload");
+            "fee", "openjoin", "upgrade", "tp", "feature", "open", "reload");
 
-    private final Guild plugin;
+    private final top.worldme.Guild plugin;
     private final GuildConfig config;
     private final GuildManager manager;
 
-    public GuildCommand(Guild plugin, GuildConfig config, GuildManager manager) {
+    public GuildCommand(top.worldme.Guild plugin, GuildConfig config, GuildManager manager) {
         this.plugin = plugin;
         this.config = config;
         this.manager = manager;
@@ -83,6 +86,7 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
             case "openjoin" -> withPlayer(sender, player -> handleOpenJoin(player));
             case "upgrade" -> withPlayer(sender, player -> handleUpgrade(player));
             case "tp" -> withPlayer(sender, player -> handleTp(player));
+            case "feature" -> withPlayer(sender, player -> handleFeature(player, label, args));
             case "open" -> handleOpen(sender, label, args);
             case "reload" -> {
                 if (!hasAdmin(sender)) {
@@ -465,6 +469,47 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
         send(player, "tp-success", null);
     }
 
+    private void handleFeature(Player player, String label, String[] args) {
+        Guild guild = manager.guildOf(player.getUniqueId());
+        if (guild == null) {
+            send(player, "no-guild", null);
+            return;
+        }
+        if (args.length < 2 || args[1].equalsIgnoreCase("list")) {
+            send(player, "feature-list-header", null);
+            for (FeatureDefinition definition : plugin.getStructureConfig().features().values()) {
+                GuildFeature feature = guild.feature(definition.key());
+                boolean unlocked = feature != null && feature.unlocked();
+                String status = unlocked
+                        ? config.getMessage("feature-status-unlocked")
+                        : config.getMessage("feature-status-locked",
+                        Map.of("level", String.valueOf(definition.requiredLevel())));
+                send(player, "feature-list-entry", Map.of("feature", definition.key(), "status", status));
+            }
+            return;
+        }
+        if (args[1].equalsIgnoreCase("open")) {
+            if (args.length < 3) {
+                send(player, "feature-usage", Map.of("label", label));
+                return;
+            }
+            String key = args[2].toLowerCase();
+            FeatureDefinition definition = plugin.getStructureConfig().feature(key);
+            if (definition == null) {
+                send(player, "feature-unknown", Map.of("key", args[2]));
+                return;
+            }
+            GuildFeatureProvider provider = manager.provider(key);
+            if (provider == null) {
+                send(player, "feature-no-provider", null);
+                return;
+            }
+            provider.open(guild, player);
+            return;
+        }
+        send(player, "feature-usage", Map.of("label", label));
+    }
+
     private void handleOpen(CommandSender sender, String label, String[] args) {
         if (!hasAdmin(sender)) {
             send(sender, "no-permission", null);
@@ -571,9 +616,15 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                     || sub.equals("kick") || sub.equals("rank") || sub.equals("open")) {
                 return onlineNames();
             }
+            if (sub.equals("feature")) {
+                return List.of("list", "open");
+            }
         }
         if (args.length == 3 && sub.equals("rank")) {
             return List.of("officer", "member");
+        }
+        if (args.length == 3 && sub.equals("feature")) {
+            return new ArrayList<>(plugin.getStructureConfig().features().keySet());
         }
         return Collections.emptyList();
     }

@@ -51,7 +51,8 @@ messages:
   create-no-money: "<red>金币不足，创建公会需要 <yellow>%cost%</yellow>。"
   create-failed: "<red>公会创建失败（领地可能重叠），费用已退回。"
 
-  no-guild: "<red>你还没有加入任何公会。"  info-header: "<gold>公会 <yellow>%name%</yellow> <gray>等级 <yellow>%level%"
+  no-guild: "<red>你还没有加入任何公会。"
+  info-header: "<gold>公会 <yellow>%name%</yellow> <gray>等级 <yellow>%level%"
   info-body: "<gray>会长：<white>%leader%</white> ｜ 成员：<white>%members%</white> ｜ 资金：<yellow>%balance%"
   info-region: "<gray>领地：<white>%region%"
 
@@ -76,6 +77,7 @@ messages:
 
   disband-success: "<red>公会已解散。"
   disband-owner-only: "<red>只有会长才能解散公会。"
+  disband-confirm: "<yellow>请使用 <white>Shift+左键</white> 再次点击以确认解散公会。"
 
   deposit-success: "<green>已存入 <yellow>%amount%</yellow> 到公会金库。"
   deposit-fail: "<green>存入失败。"
@@ -110,3 +112,13 @@ messages:
   rank-set: "<green>已将 <yellow>%player%</yellow> 的职级设为 <yellow>%rank%</yellow>。"
   rank-invalid: "<red>未知职级：<white>%rank%</white>。"
   amount-invalid: "<red>金额无效。"
+
+  feature-list-header: "<gold>公会功能："
+  feature-list-entry: "<gray>- <white>%feature%</white>：%status%"
+  feature-status-unlocked: "<green>已解锁"
+  feature-status-locked: "<red>未解锁（等级 %level%）"
+  feature-unlocked: "<green>公会解锁了新功能：<yellow>%feature%"
+  feature-locked: "<red>该功能尚未解锁，请先建造对应结构。"
+  feature-unknown: "<red>未知功能：<white>%key%</white>。"
+  feature-no-provider: "<red>该功能暂无可交互界面。"
+  feature-usage: "<yellow>用法：<white>/%label% feature [list|open <功能>]"

@@ -14,7 +14,7 @@ commands:
     description: Worldme-Guild 公会命令
     aliases:
       - wmg
-    usage: /wmguild [create <名称> | info | upgrade | deposit <金额> | withdraw <金额> | member add|remove|kick <玩家> | subregion | tp | open <玩家> | reload]
+    usage: /wmguild [create <名称> | info | join <公会> | accept|reject <玩家> | invite|kick <玩家> | rank <玩家> <officer|member> | leave | disband | deposit|withdraw|request <金额> | fundapprove|fundreject <编号> | fee <金额> | openjoin | upgrade | tp | feature [list|open <功能>] | open [玩家] | reload]
 permissions:
   worldme.guild.use:
     default: true

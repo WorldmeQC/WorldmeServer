@@ -20,10 +20,13 @@ public class GuildMenuListener implements Listener {
             return;
         }
         if (clicked.equals(event.getInventory())) {
+            if (menu.isEditableSlot(event.getRawSlot())) {
+                return;
+            }
             event.setCancelled(true);
             menu.handleClick(event);
         } else {
-            if (menu.allowPlayerInventoryClick() && !event.isShiftClick()) {
+            if (menu.allowPlayerInventoryClick()) {
                 event.setCancelled(false);
             } else {
                 event.setCancelled(true);
@@ -33,9 +36,23 @@ public class GuildMenuListener implements Listener {
 
     @EventHandler
     public void onDrag(InventoryDragEvent event) {
-        if (event.getInventory().getHolder() instanceof GuildMenuBase) {
-            event.setCancelled(true);
+        if (!(event.getInventory().getHolder() instanceof GuildMenuBase menu)) {
+            return;
         }
+        int topSize = event.getInventory().getSize();
+        boolean allow = true;
+        for (int slot : event.getRawSlots()) {
+            if (slot < topSize) {
+                if (!menu.isEditableSlot(slot)) {
+                    allow = false;
+                    break;
+                }
+            } else if (!menu.allowPlayerInventoryClick()) {
+                allow = false;
+                break;
+            }
+        }
+        event.setCancelled(!allow);
     }
 
     @EventHandler

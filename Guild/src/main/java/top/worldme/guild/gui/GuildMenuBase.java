@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public abstract class GuildMenuBase implements InventoryHolder {
@@ -142,6 +143,11 @@ public abstract class GuildMenuBase implements InventoryHolder {
 
     protected Component mini(String text) {
         return MiniMessage.miniMessage().deserialize(text == null ? "" : text);
+    }
+
+    protected String nameOf(UUID uuid) {
+        String name = Bukkit.getOfflinePlayer(uuid).getName();
+        return name == null ? "未知" : name;
     }
 
     protected void sendMessage(String key, Map<String, String> placeholders) {

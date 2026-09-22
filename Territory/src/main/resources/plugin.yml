@@ -12,7 +12,7 @@ commands:
     description: Worldme-Territory 领地命令
     aliases:
       - wml
-    usage: /wmterritory [claim | expand <方向> <名称> [单位] | tp <名称> | sethome <名称> | unclaim <名称> | name <名称> <新名称> | enter <名称> <消息> | leave <名称> <消息> | reload]
+    usage: /wmterritory [claim | expand <方向> <名称> [单位] | tp <名称> | sethome <名称> | unclaim <名称> | name <名称> <新名称> | member add|remove <名称> <玩家> | perm <名称> <玩家> <权限> <true|false> | setting <名称> <设置> <true|false> | subregion create|remove|list <名称> ... | enter <名称> <消息> | leave <名称> <消息> | open [玩家] | reload]
 permissions:
   worldme.territory.use:
     default: true

@@ -20,6 +20,7 @@ import top.worldme.guild.data.GuildRank;
 import top.worldme.guild.economy.VaultHook;
 import top.worldme.guild.feature.FeatureRegistry;
 import top.worldme.guild.feature.GuildFeatureProvider;
+import top.worldme.guild.feature.StructureScanner;
 import top.worldme.territory.api.TerritoryApi;
 import top.worldme.territory.data.Direction;
 import top.worldme.territory.data.OwnerType;
@@ -1035,6 +1036,110 @@ public class GuildManager implements GuildApi {
 
     public GuildFeatureProvider provider(String key) {
         return registry.get(key);
+    }
+
+    // ---------- 结构识别与功能解锁 ----------
+
+    /**
+     * 启动时扫描全部公会领地，补全结构解锁状态。
+     */
+    public void scanAll() {
+        for (Guild guild : guilds) {
+            scanGuildRegion(guild);
+        }
+    }
+
+    /**
+     * 扫描某个公会领地内的全部结构并解锁对应功能。
+     */
+    public void scanGuildRegion(Guild guild) {
+        Region region = regionOf(guild);
+        if (region == null) {
+            return;
+        }
+        for (String structureKey : StructureScanner.scan(region, structureConfig)) {
+            unlockByStructure(guild, structureKey, null);
+        }
+    }
+
+    /**
+     * 玩家在公会领地内放置方块后，检查是否补全了某个结构。
+     */
+    public void handleBlockPlace(Player player, Location location) {
+        Guild guild = guildOf(player.getUniqueId());
+        if (guild == null) {
+            return;
+        }
+        Region region = regionOf(guild);
+        if (region == null || location.getWorld() == null || !region.contains(location)) {
+            return;
+        }
+        for (String structureKey : StructureScanner.checkAt(region, location, structureConfig)) {
+            unlockByStructure(guild, structureKey, location);
+        }
+    }
+
+    /**
+     * 依据结构键解锁相应功能。返回是否发生了新的解锁。
+     */
+    public boolean unlockByStructure(Guild guild, String structureKey, Location location) {
+        if (guild == null || structureKey == null) {
+            return false;
+        }
+        boolean changed = false;
+        for (FeatureDefinition definition : structureConfig.features().values()) {
+            if (!definition.unlockType().needsStructure()) {
+                continue;
+            }
+            if (!structureKey.equals(definition.structureKey())) {
+                continue;
+            }
+            if (guild.level() < definition.requiredLevel()) {
+                continue;
+            }
+            GuildFeature feature = guild.feature(definition.key());
+            if (feature != null && feature.unlocked()) {
+                continue;
+            }
+            if (feature == null) {
+                feature = new GuildFeature(definition.key(), structureKey, true, true, null,
+                        System.currentTimeMillis());
+                guild.addFeature(feature);
+            } else {
+                feature.setUnlocked(true);
+                feature.setEnabled(true);
+                feature.setUnlockedAt(System.currentTimeMillis());
+            }
+            persistFeature(guild.id(), feature);
+            GuildFeatureProvider provider = registry.get(definition.key());
+            if (provider != null) {
+                provider.onUnlock(guild, location);
+                provider.onEnable(guild);
+            }
+            String name = provider == null ? definition.key() : provider.displayName();
+            for (UUID uuid : guild.members().keySet()) {
+                notify(uuid, config.getMessage("feature-unlocked", Map.of("feature", name)));
+            }
+            changed = true;
+        }
+        return changed;
+    }
+
+    /**
+     * 周期性驱动已启用功能的 tick 效果（如信标 buff）。
+     */
+    public void tickFeatures() {
+        for (Guild guild : guilds) {
+            for (GuildFeature feature : guild.features().values()) {
+                if (!feature.unlocked() || !feature.enabled()) {
+                    continue;
+                }
+                GuildFeatureProvider provider = registry.get(feature.key());
+                if (provider != null) {
+                    provider.onTick(guild);
+                }
+            }
+        }
     }
 
     // ---------- DB 工具 ----------

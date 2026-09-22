@@ -9,6 +9,8 @@ import top.worldme.guild.config.GuildMenuConfig;
 import top.worldme.guild.config.StructureConfig;
 import top.worldme.guild.data.GuildDatabase;
 import top.worldme.guild.economy.VaultHook;
+import top.worldme.guild.feature.impl.BeaconFeature;
+import top.worldme.guild.feature.impl.WarehouseFeature;
 import top.worldme.guild.gui.GuildMenuListener;
 import top.worldme.guild.listener.GuildListener;
 import top.worldme.guild.manager.GuildManager;
@@ -61,6 +63,11 @@ public class Guild extends JavaPlugin {
 
         this.guildManager = new GuildManager(this, guildConfig, structureConfig, database, vaultHook, territoryApi);
         guildManager.load();
+
+        guildManager.registerFeature(new BeaconFeature(this));
+        guildManager.registerFeature(new WarehouseFeature(this));
+        guildManager.scanAll();
+        Bukkit.getScheduler().runTaskTimer(this, () -> guildManager.tickFeatures(), 200L, 100L);
 
         Bukkit.getPluginManager().registerEvents(new GuildMenuListener(), this);
         Bukkit.getPluginManager().registerEvents(new GuildListener(guildManager), this);
