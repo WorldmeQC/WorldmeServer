@@ -1,0 +1,22 @@
+name: Worldme-Territory
+version: 1.0.0
+main: top.worldme.Territory
+api-version: '26.2'
+author: WorldmeQC
+description: Worldme 服务器 领地插件
+softdepend:
+  - Vault
+  - PlaceholderAPI
+commands:
+  wmterritory:
+    description: Worldme-Territory 领地命令
+    aliases:
+      - wml
+    usage: /wmterritory [claim | expand <方向> <名称> [单位] | tp <名称> | sethome <名称> | unclaim <名称> | name <名称> <新名称> | enter <名称> <消息> | leave <名称> <消息> | reload]
+permissions:
+  worldme.territory.use:
+    default: true
+    description: 允许使用领地功能
+  worldme.territory.admin:
+    default: op
+    description: 允许使用 Worldme-Territory 管理命令

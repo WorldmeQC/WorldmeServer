@@ -1,0 +1,427 @@
+# ============ 通用背景 ============
+background:
+  fill: true
+  material: GRAY_STAINED_GLASS_PANE
+  name: " "
+
+# ============ 领地列表 ============
+list:
+  title: "<gold><bold>我的领地"
+  rows: 6
+  content-slots:
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 19
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 28
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
+    - 37
+    - 38
+    - 39
+    - 40
+    - 41
+    - 42
+    - 43
+  item:
+    material: OAK_DOOR
+    name: "<green>%name%"
+    lore:
+      - "<gray>世界：<white>%world%"
+      - "<gray>范围：<white>%bounds%"
+      - "<gray>体积：<white>%volume%</white> 单位"
+      - "<gray>成员：<white>%members%</white> 人"
+      - "<gray>传送点：%warp%"
+      - ""
+      - "<yellow>点击管理"
+  items:
+    info:
+      slot: 4
+      material: COMPASS
+      name: "<aqua>我的领地"
+      lore:
+        - "<gray>数量：<yellow>%count%/%max%"
+        - "<gray>每单位体积：<yellow>16×16×16"
+    create:
+      slot: 48
+      material: GRASS_BLOCK
+      name: "<green>创建领地"
+      lore:
+        - "<gray>认领当前所在的 16³ 单元"
+        - "<gray>费用：<yellow>%cost%"
+    prev-button:
+      slot: 45
+      material: ARROW
+      name: "<gray>上一页"
+      lore:
+        - "<gray>点击查看上一页"
+    next-button:
+      slot: 53
+      material: ARROW
+      name: "<gray>下一页"
+      lore:
+        - "<gray>点击查看下一页"
+    close-button:
+      slot: 49
+      material: BARRIER
+      name: "<red>关闭"
+
+# ============ 领地管理 ============
+detail:
+  title: "<gold>管理 · %name%"
+  rows: 4
+  items:
+    info:
+      slot: 4
+      material: MAP
+      name: "<aqua>%name%"
+      lore:
+        - "<gray>世界：<white>%world%"
+        - "<gray>范围：<white>%bounds%"
+        - "<gray>体积：<white>%volume%</white> 单位"
+        - "<gray>成员：<white>%members%</white> 人"
+        - "<gray>传送点：%warp%"
+    expand:
+      slot: 19
+      material: IRON_PICKAXE
+      name: "<green>扩展领地"
+      lore:
+        - "<gray>按方向扩展领地大小"
+        - "<gray>当前体积：<white>%volume%</white> 单位"
+        - "<yellow>点击选择方向"
+    teleport:
+      slot: 20
+      material: ENDER_PEARL
+      name: "<green>传送到领地"
+      lore:
+        - "<gray>传送到领地默认传送点"
+    sethome:
+      slot: 21
+      material: LODESTONE
+      name: "<green>设置传送点"
+      lore:
+        - "<gray>将当前位置设为领地传送点"
+    enter-message:
+      slot: 22
+      material: LIME_BANNER
+      name: "<green>设置进入消息"
+      lore:
+        - "<gray>当前：%enter%"
+        - "<yellow>点击输入"
+    leave-message:
+      slot: 23
+      material: YELLOW_BANNER
+      name: "<yellow>设置离开消息"
+      lore:
+        - "<gray>当前：%leave%"
+        - "<yellow>点击输入"
+    name:
+      slot: 24
+      material: NAME_TAG
+      name: "<gold>领地改名"
+      lore:
+        - "<gray>当前：<white>%name%"
+        - "<yellow>点击输入"
+    members:
+      slot: 25
+      material: PLAYER_HEAD
+      name: "<aqua>领地成员"
+      lore:
+        - "<gray>成员：<white>%members%</white> 人"
+        - "<yellow>点击管理"
+    settings:
+      slot: 26
+      material: COMPARATOR
+      name: "<yellow>领地设置"
+      lore:
+        - "<gray>刷怪、爆炸、火焰等规则"
+        - "<yellow>点击设置"
+    unclaim:
+      slot: 27
+      material: TNT
+      name: "<dark_red>删除领地"
+      lore:
+        - "<red>Shift+左键 确认删除"
+    back:
+      slot: 31
+      material: ARROW
+      name: "<gray>返回领地列表"
+
+# ============ 扩展方向 ============
+expand:
+  title: "<green>扩展 · %name%"
+  rows: 3
+  items:
+    info:
+      slot: 4
+      material: COMPASS
+      name: "<aqua>选择扩展方向"
+      lore:
+        - "<gray>当前体积：<white>%volume%</white> 单位"
+        - "<gray>每单位：<yellow>%unit_cost%"
+    north:
+      slot: 10
+      material: LIGHT_BLUE_DYE
+      name: "<aqua>向北扩展"
+      lore:
+        - "<gray>一次扩展 <yellow>%step%</yellow> 个单位"
+        - "<gray>费用：<yellow>%cost%"
+    south:
+      slot: 12
+      material: ORANGE_DYE
+      name: "<gold>向南扩展"
+      lore:
+        - "<gray>一次扩展 <yellow>%step%</yellow> 个单位"
+        - "<gray>费用：<yellow>%cost%"
+    west:
+      slot: 14
+      material: WHITE_DYE
+      name: "<white>向西扩展"
+      lore:
+        - "<gray>一次扩展 <yellow>%step%</yellow> 个单位"
+        - "<gray>费用：<yellow>%cost%"
+    east:
+      slot: 16
+      material: GRAY_DYE
+      name: "<gray>向东扩展"
+      lore:
+        - "<gray>一次扩展 <yellow>%step%</yellow> 个单位"
+        - "<gray>费用：<yellow>%cost%"
+    up:
+      slot: 20
+      material: FEATHER
+      name: "<green>向上扩展"
+      lore:
+        - "<gray>一次扩展 <yellow>%step%</yellow> 个单位"
+        - "<gray>费用：<yellow>%cost%"
+    down:
+      slot: 24
+      material: SCAFFOLDING
+      name: "<dark_green>向下扩展"
+      lore:
+        - "<gray>一次扩展 <yellow>%step%</yellow> 个单位"
+        - "<gray>费用：<yellow>%cost%"
+    back:
+      slot: 22
+      material: ARROW
+      name: "<gray>返回领地管理"
+
+# ============ 领地设置 ============
+settings:
+  title: "<gold>领地设置 · %name%"
+  rows: 3
+  items:
+    info:
+      slot: 4
+      material: COMPASS
+      name: "<aqua>领地设置"
+      lore:
+        - "<gray>控制领地内的规则"
+        - "<gray>左键开启 / 右键关闭"
+    SPAWN:
+      slot: 10
+      material: ZOMBIE_HEAD
+      name: "<yellow>刷怪"
+      lore:
+        - "<gray>领地内是否允许自然刷怪"
+        - "<gray>当前：%state%"
+    TNT_EXPLODE:
+      slot: 11
+      material: TNT
+      name: "<red>TNT 爆炸"
+      lore:
+        - "<gray>领地内是否允许 TNT 破坏方块"
+        - "<gray>当前：%state%"
+    CREEPER_EXPLODE:
+      slot: 12
+      material: CREEPER_HEAD
+      name: "<green>苦力怕爆炸"
+      lore:
+        - "<gray>领地内是否允许苦力怕破坏方块"
+        - "<gray>当前：%state%"
+    FIRE_SPREAD:
+      slot: 13
+      material: FLINT_AND_STEEL
+      name: "<gold>火焰蔓延"
+      lore:
+        - "<gray>领地内是否允许火焰蔓延"
+        - "<gray>当前：%state%"
+    GLOW_PLAYERS:
+      slot: 14
+      material: GLOWSTONE_DUST
+      name: "<aqua>玩家发光"
+      lore:
+        - "<gray>领地内玩家是否显示发光轮廓"
+        - "<gray>当前：%state%"
+    back:
+      slot: 22
+      material: ARROW
+      name: "<gray>返回领地管理"
+
+# ============ 领地成员 ============
+members:
+  title: "<gold>领地成员 · %name%"
+  rows: 6
+  content-slots:
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 19
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 28
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
+    - 37
+    - 38
+    - 39
+    - 40
+    - 41
+    - 42
+    - 43
+  item:
+    material: PLAYER_HEAD
+    name: "<aqua>%player%"
+    lore:
+      - "<gray>点击设置权限"
+  items:
+    info:
+      slot: 4
+      material: PLAYER_HEAD
+      name: "<aqua>%name%"
+      lore:
+        - "<gray>成员：<white>%count%</white> 人"
+    add:
+      slot: 48
+      material: WRITABLE_BOOK
+      name: "<green>添加成员"
+      lore:
+        - "<gray>点击输入玩家名称"
+    back:
+      slot: 49
+      material: ARROW
+      name: "<gray>返回领地管理"
+
+# ============ 成员权限 ============
+member-permissions:
+  title: "<gold>成员权限 · %player%"
+  rows: 3
+  items:
+    info:
+      slot: 4
+      material: PAPER
+      name: "<aqua>%player%"
+      lore:
+        - "<gray>左键授予 / 右键取消"
+    BUILD:
+      slot: 10
+      material: BRICKS
+      name: "<yellow>放置方块"
+      lore:
+        - "<gray>当前：%state%"
+    BREAK:
+      slot: 11
+      material: IRON_PICKAXE
+      name: "<yellow>破坏方块"
+      lore:
+        - "<gray>当前：%state%"
+    USE_CONTAINER:
+      slot: 12
+      material: CHEST
+      name: "<yellow>使用容器"
+      lore:
+        - "<gray>当前：%state%"
+    USE_DOOR:
+      slot: 13
+      material: OAK_DOOR
+      name: "<yellow>使用门"
+      lore:
+        - "<gray>当前：%state%"
+    USE_BUTTON:
+      slot: 14
+      material: STONE_BUTTON
+      name: "<yellow>使用按钮/拉杆"
+      lore:
+        - "<gray>当前：%state%"
+    INTERACT_ENTITY:
+      slot: 15
+      material: ARMOR_STAND
+      name: "<yellow>交互实体"
+      lore:
+        - "<gray>当前：%state%"
+    TELEPORT:
+      slot: 16
+      material: ENDER_PEARL
+      name: "<yellow>传送"
+      lore:
+        - "<gray>当前：%state%"
+    remove:
+      slot: 20
+      material: TNT
+      name: "<dark_red>移除成员"
+      lore:
+        - "<red>Shift+左键 确认移除"
+    back:
+      slot: 22
+      material: ARROW
+      name: "<gray>返回成员列表"
+
+# ============ 输入对话框 ============
+dialogs:
+  name:
+    title: "<gold>领地改名"
+    label: "<gray>新名称"
+    confirm: "<green>确定"
+    cancel: "<red>取消"
+    width: 300
+    max-length: 24
+  enter:
+    title: "<gold>进入消息"
+    label: "<gray>留空使用默认"
+    confirm: "<green>确定"
+    cancel: "<red>取消"
+    width: 300
+    max-length: 64
+  leave:
+    title: "<gold>离开消息"
+    label: "<gray>留空使用默认"
+    confirm: "<green>确定"
+    cancel: "<red>取消"
+    width: 300
+    max-length: 64
+  member:
+    title: "<gold>添加成员"
+    label: "<gray>玩家名称"
+    confirm: "<green>确定"
+    cancel: "<red>取消"
+    width: 300
+    max-length: 16
+
+# 扩展界面一次扩展的单位数（Shift 点击可乘以 2）
+expand-step: 1

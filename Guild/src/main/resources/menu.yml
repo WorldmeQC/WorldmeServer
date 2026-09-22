@@ -1,0 +1,166 @@
+# ============ 通用背景 ============
+background:
+  fill: true
+  material: GRAY_STAINED_GLASS_PANE
+  name: " "
+
+# ============ 公会主界面 ============
+main:
+  title: "<gold><bold>公会"
+  rows: 4
+  items:
+    info:
+      slot: 4
+      material: WHITE_BANNER
+      name: "<gold>%name%"
+      lore:
+        - "<gray>会长：<white>%leader%"
+        - "<gray>等级：<yellow>%level%"
+        - "<gray>成员：<white>%members%"
+        - "<gray>资金：<yellow>%balance%"
+        - "<gray>入会费：<yellow>%join_fee%"
+        - "<gray>加入方式：%join_mode%"
+    create:
+      slot: 11
+      material: WRITABLE_BOOK
+      name: "<green>创建公会"
+      lore:
+        - "<gray>消耗 <yellow>%cost%</yellow> 金币"
+        - "<yellow>点击输入公会名称"
+    join:
+      slot: 15
+      material: PLAYER_HEAD
+      name: "<yellow>加入公会"
+      lore:
+        - "<gray>输入公会名称申请加入"
+    deposit:
+      slot: 10
+      material: HOPPER
+      name: "<green>存入资金"
+      lore:
+        - "<gray>向公会金库存入金币"
+        - "<yellow>点击输入金额"
+    withdraw:
+      slot: 12
+      material: DROPPER
+      name: "<yellow>取出资金"
+      lore:
+        - "<gray>从公会金库取出金币（需权限）"
+        - "<yellow>点击输入金额"
+    upgrade:
+      slot: 13
+      material: EXPERIENCE_BOTTLE
+      name: "<light_purple>升级公会"
+      lore:
+        - "<gray>当前等级：<yellow>%level%/%max_level%"
+        - "<gray>费用：<yellow>%upgrade_cost%"
+        - "<gray>升级后领地自动扩建"
+        - "<yellow>点击升级"
+    members:
+      slot: 14
+      material: PLAYER_HEAD
+      name: "<aqua>成员管理"
+      lore:
+        - "<gray>成员：<white>%members%"
+        - "<yellow>点击查看"
+    tp:
+      slot: 16
+      material: ENDER_PEARL
+      name: "<green>传送到公会领地"
+      lore:
+        - "<gray>传送到公会领地传送点（若已设置）"
+    leave:
+      slot: 25
+      material: OAK_DOOR
+      name: "<red>退出公会"
+      lore:
+        - "<red>点击退出公会"
+    disband:
+      slot: 25
+      material: TNT
+      name: "<dark_red>解散公会"
+      lore:
+        - "<red>Shift+左键 确认解散"
+    close:
+      slot: 35
+      material: BARRIER
+      name: "<red>关闭"
+
+# ============ 成员列表 ============
+members:
+  title: "<gold>公会成员"
+  rows: 6
+  content-slots:
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 19
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 28
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
+    - 37
+    - 38
+    - 39
+    - 40
+    - 41
+    - 42
+    - 43
+  item:
+    material: PLAYER_HEAD
+    name: "<aqua>%player%"
+    lore:
+      - "<gray>职级：<yellow>%rank%"
+      - "<gray>状态：%status%"
+      - ""
+      - "<yellow>左键 提升为官员"
+      - "<yellow>右键 降为成员"
+      - "<red>Shift+左键 移出公会"
+  items:
+    info:
+      slot: 4
+      material: PAPER
+      name: "<aqua>%name%"
+      lore:
+        - "<gray>成员：<white>%count%"
+    back:
+      slot: 49
+      material: ARROW
+      name: "<gray>返回公会界面"
+
+# ============ 输入对话框 ============
+dialogs:
+  create:
+    title: "<gold>创建公会"
+    label: "<gray>公会名称"
+    confirm: "<green>确定"
+    cancel: "<red>取消"
+    width: 300
+    max-length: 16
+  join:
+    title: "<gold>加入公会"
+    label: "<gray>公会名称"
+    confirm: "<green>申请"
+    cancel: "<red>取消"
+    width: 300
+    max-length: 16
+  amount:
+    title: "<gold>输入金额"
+    label: "<gray>金额"
+    confirm: "<green>确定"
+    cancel: "<red>取消"
+    width: 300
+    max-length: 12

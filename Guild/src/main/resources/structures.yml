@@ -1,0 +1,43 @@
+# ==================== 公会结构与功能 ====================
+# 结构：相对方块图案。offset 为 [dx, dy, dz]，相对扫描原点（子区域内的每个可能位置）。
+# material 支持原版材质名（大小写不敏感）。
+structures:
+  guild-beacon:
+    bounds: {x: 5, y: 3, z: 5}
+    pattern:
+      - {offset: [0, 0, 0], material: "minecraft:beacon"}
+      - {offset: [0, -1, 0], material: "minecraft:iron_block"}
+  guild-warehouse:
+    bounds: {x: 7, y: 4, z: 7}
+    pattern:
+      - {offset: [0, 0, 0], material: "minecraft:chest"}
+      - {offset: [1, 0, 0], material: "minecraft:chest"}
+
+# 功能：绑定到结构或仅按等级解锁（unlocked-by: level）
+features:
+  beacon:
+    type: beacon
+    unlocked-by: structure
+    structure: guild-beacon
+    required-level: 1
+    options:
+      effect: SPEED
+      amplifier: 1
+      duration: 300
+  warehouse:
+    type: warehouse
+    unlocked-by: structure
+    structure: guild-warehouse
+    required-level: 2
+  member-cap:
+    type: member-cap
+    unlocked-by: level
+    required-level: 1
+  bank-upgrade:
+    type: bank
+    unlocked-by: level
+    required-level: 3
+  war:
+    type: war
+    unlocked-by: level
+    required-level: 5

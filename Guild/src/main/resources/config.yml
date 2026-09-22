@@ -1,0 +1,112 @@
+# ==================== 公会 ====================
+guild:
+  # 创建公会费用（Vault 金币）
+  create-cost: 10000.0
+  # 默认入会费，会长可调整
+  default-join-fee: 0.0
+  # 入会费最低值
+  min-join-fee: 0.0
+  # 入会费中归入公会金库的比例（0-1），其余部分作为系统回收
+  fee-guild-share: 0.75
+  # 入会未满多少天不可退会（0 表示不限制）
+  no-leave-days: 7
+  # 退会后重新入会的冷却小时数
+  rejoin-cooldown-hours: 24
+  # 公会资金操作快捷金额
+  amount-presets: [1000, 10000, 100000]
+
+  # 公会初始领地：以创建者所在位置为中心
+  region:
+    chunks-x: 3
+    sections-y: 1
+    chunks-z: 3
+
+  # 成员上限：base + per-level * (level - 1)，0 表示不限制
+  member-cap:
+    base: 20
+    per-level: 5
+
+  # 升级
+  level:
+    max: 10
+    # 从 1 级升到 2 级的基础费用，之后按 multiplier 递增
+    upgrade-cost: 50000.0
+    upgrade-cost-multiplier: 1.5
+    # 每次升级自动扩建的区块数（向东、向南各扩展）
+    expand-per-level: 1
+
+messages:
+  prefix: "<gold>[公会] "
+  player-only: "<red>该命令只能由玩家执行。"
+  no-permission: "<red>你没有权限执行此命令。"
+  no-economy: "<red>经济系统未就绪，无法进行操作。"
+  reloaded: "<green>配置已重载。"
+  invalid-usage: "<yellow>用法：<white>%usage%"
+  region-unavailable: "<red>领地系统不可用，无法创建公会。"
+
+  create-success: "<green>公会 <yellow>%name%</yellow> 创建成功！"
+  create-in-guild: "<red>你已经在一个公会中了。"
+  create-name-taken: "<red>公会名称已被占用。"
+  create-name-invalid: "<red>公会名称无效（1-16 个字符）。"
+  create-no-money: "<red>金币不足，创建公会需要 <yellow>%cost%</yellow>。"
+  create-failed: "<red>公会创建失败（领地可能重叠），费用已退回。"
+
+  no-guild: "<red>你还没有加入任何公会。"  info-header: "<gold>公会 <yellow>%name%</yellow> <gray>等级 <yellow>%level%"
+  info-body: "<gray>会长：<white>%leader%</white> ｜ 成员：<white>%members%</white> ｜ 资金：<yellow>%balance%"
+  info-region: "<gray>领地：<white>%region%"
+
+  join-fee-set: "<green>入会费已设置为 <yellow>%fee%</yellow>。"
+  open-join-on: "<green>已开启自由加入。"
+  open-join-off: "<green>已关闭自由加入（需会长审批）。"
+  join-success: "<green>你已加入公会 <yellow>%name%</yellow>。"
+  join-no-money: "<red>金币不足，入会需要 <yellow>%fee%</yellow>。"
+  join-cooldown: "<red>退会冷却中，暂时无法加入公会。"
+  join-already: "<red>你已经提交过入会申请了。"
+  join-requested: "<green>已向 <yellow>%name%</yellow> 提交入会申请。"
+  join-request-cancelled: "<green>已撤回入会申请。"
+  join-open: "<green>该公会可自由加入，直接加入即可。"
+  join-approved: "<green>你加入 <yellow>%name%</yellow> 的申请已通过。"
+  join-denied: "<red>你加入 <yellow>%name%</yellow> 的申请被拒绝。"
+
+  leave-success: "<green>你已退出公会。"
+  leave-owner: "<red>会长不能退出公会，请转让或解散。"
+  leave-too-soon: "<red>入会未满 <yellow>%days%</yellow> 天，暂时不能退会。"
+  kick-success: "<green>已把 <yellow>%player%</yellow> 移出公会。"
+  kick-target: "<red>你已被移出公会 <yellow>%name%</yellow>。"
+
+  disband-success: "<red>公会已解散。"
+  disband-owner-only: "<red>只有会长才能解散公会。"
+
+  deposit-success: "<green>已存入 <yellow>%amount%</yellow> 到公会金库。"
+  deposit-fail: "<green>存入失败。"
+  withdraw-success: "<green>已从公会金库取出 <yellow>%amount%</yellow>。"
+  withdraw-fail: "<red>公会资金不足或权限不足。"
+  balance: "<gray>公会资金：<yellow>%balance%"
+
+  upgrade-success: "<green>公会已升级到 <yellow>%level%</yellow> 级！领地已自动扩建。"
+  upgrade-max: "<red>公会已达最高等级。"
+  upgrade-no-money: "<red>金币不足，升级需要 <yellow>%cost%</yellow>。"
+  upgrade-failed: "<green>公会升级失败（领地扩建冲突）。"
+
+  member-added: "<green>已添加成员 <yellow>%player%</yellow>。"
+  member-removed: "<green>已移除成员 <yellow>%player%</yellow>。"
+  member-not-found: "<red>找不到玩家：<white>%player%</white>。"
+  member-already: "<red>该玩家已在公会中。"
+  member-limit: "<red>公会成员已达上限（<yellow>%max%</yellow>）。"
+
+  tp-success: "<green>已传送至公会领地。"
+  tp-no-region: "<red>公会没有可用领地。"
+
+  open-success: "<gray>已为 <white>%player%</white> 打开公会界面。"
+
+  guild-not-found: "<red>找不到公会：<white>%name%</white>。"
+  player-not-found: "<red>找不到玩家：<white>%player%</white>。"
+  join-accepted-actor: "<green>已批准 <yellow>%player%</yellow> 入会。"
+  join-rejected-actor: "<yellow>已拒绝 <yellow>%player%</yellow> 的入会申请。"
+  fund-request-sent: "<green>已提交用款申请。"
+  fund-request-list: "<gray>用款申请 <white>#%id%</white>：<white>%player%</white> 申请 <yellow>%amount%"
+  fund-approved: "<green>已批准用款申请 <white>#%id%</white>。"
+  fund-rejected: "<yellow>已拒绝用款申请 <white>#%id%</white>。"
+  rank-set: "<green>已将 <yellow>%player%</yellow> 的职级设为 <yellow>%rank%</yellow>。"
+  rank-invalid: "<red>未知职级：<white>%rank%</white>。"
+  amount-invalid: "<red>金额无效。"

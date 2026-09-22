@@ -1,0 +1,24 @@
+name: Worldme-Guild
+version: 1.0.0
+main: top.worldme.Guild
+api-version: '26.2'
+author: WorldmeQC
+description: Worldme 服务器 公会插件
+depend:
+  - Worldme-Territory
+softdepend:
+  - Vault
+  - PlaceholderAPI
+commands:
+  wmguild:
+    description: Worldme-Guild 公会命令
+    aliases:
+      - wmg
+    usage: /wmguild [create <名称> | info | upgrade | deposit <金额> | withdraw <金额> | member add|remove|kick <玩家> | subregion | tp | open <玩家> | reload]
+permissions:
+  worldme.guild.use:
+    default: true
+    description: 允许使用公会功能
+  worldme.guild.admin:
+    default: op
+    description: 允许使用 Worldme-Guild 管理命令

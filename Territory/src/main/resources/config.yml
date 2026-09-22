@@ -1,0 +1,114 @@
+# ==================== 领地 ====================
+# 领地以 16*16*16 为一个单位（一个区块长宽 × 16 格高度）。
+# 创建时认领玩家所在的 1 个单位，之后可按方向扩展。
+
+claim:
+  # 创建领地的基础费用（含第 1 个单位）
+  base-cost: 1000.0
+  # 每个单位的费用，扩展时按体积差价收取
+  per-unit-cost: 250.0
+
+# 每位玩家可拥有的领地数量（个人领地）
+# permissions 中可配置权限节点对应的上限，玩家拥有对应权限时取最大者
+max-claims:
+  default: 1
+  permissions:
+    worldme.territory.claim.3: 3
+    worldme.territory.claim.5: 5
+
+# 领地大小上限
+max-size:
+  # 长宽方向（区块数）上限
+  horizontal-chunks: 16
+  # 高度方向（16 格段）上限，0 表示只受世界高度限制
+  vertical-sections: 0
+
+# 允许圈地的世界：whitelist 非空时仅这些世界可圈地；blacklist 中的世界始终禁止
+worlds:
+  whitelist: []
+  blacklist: []
+
+# 领地成员数量上限（0 表示不限制）
+members:
+  max: 10
+
+# 默认值
+defaults:
+  # 新增成员默认获得的权限
+  member-permissions:
+    - BUILD
+    - USE_DOOR
+  # 新建领地的默认设置项
+  settings:
+    SPAWN: true
+    TNT_EXPLODE: true
+    CREEPER_EXPLODE: true
+    FIRE_SPREAD: true
+    GLOW_PLAYERS: false
+
+messages:
+  prefix: "<gold>[领地] "
+  player-only: "<red>该命令只能由玩家执行。"
+  no-permission: "<red>你没有权限执行此命令。"
+  no-economy: "<red>经济系统未就绪，无法进行操作。"
+  reloaded: "<green>配置已重载。"
+  invalid-usage: "<yellow>用法：<white>%usage%"
+  invalid-direction: "<red>未知方向：<white>%direction%</white>（可用 N/S/E/W/UP/DOWN）"
+  invalid-amount: "<red>数量必须是大于 0 的整数。"
+
+  claim-success: "<green>领地创建成功！花费 <yellow>%cost%</yellow>，当前领地 <yellow>%count%/%max%</yellow>。"
+  claim-at-cap: "<red>你的领地数量已达上限（<yellow>%max%</yellow>）。"
+  claim-overlap: "<red>该位置已被其它领地占用。"
+  claim-world-denied: "<red>该世界不允许圈地。"
+  claim-no-money: "<red>金币不足，创建领地需要 <yellow>%cost%</yellow>。"
+  claim-economy: "<red>经济系统不可用，无法创建领地。"
+
+  expand-success: "<green>已向 <yellow>%direction%</yellow> 扩展 <yellow>%units%</yellow> 个单位，花费 <yellow>%cost%</yellow>。"
+  expand-limit: "<red>已达到领地大小上限，无法继续扩展。"
+  expand-world-bound: "<red>已到达世界高度边界，无法继续扩展。"
+  expand-overlap: "<red>扩展后会与其它领地重叠。"
+  expand-no-money: "<red>金币不足，本次扩展需要 <yellow>%cost%</yellow>。"
+  expand-not-owner: "<red>只有领地主人才能扩展该领地。"
+
+  region-not-found: "<red>找不到名为 <white>%name%</white> 的领地。"
+  region-not-owner: "<red>你不是该领地的主人。"
+  unclaim-success: "<green>已删除领地 <yellow>%name%</yellow>。"
+  name-success: "<green>领地已改名为 <yellow>%name%</yellow>。"
+  enter-msg-set: "<green>已设置进入消息。"
+  leave-msg-set: "<green>已设置离开消息。"
+  sethome-success: "<green>已设置领地传送点。"
+  sethome-outside: "<red>请先站到该领地范围内。"
+  home-not-set: "<red>该领地还未设置传送点。"
+  tp-success: "<green>已传送至领地 <yellow>%name%</yellow>。"
+
+  # 玩家进入/离开领地时显示的标题（使用 %region% 与 %owner% 占位符）
+  enter-title: "<green>%region%"
+  enter-subtitle: "<gray>领主：<white>%owner%"
+  leave-title: "<yellow>离开 %region%"
+  leave-subtitle: "<gray>已离开领地"
+
+  # 保护提示
+  deny-break: "<red>你不能在这里破坏方块。"
+  deny-place: "<red>你不能在这里放置方块。"
+  deny-container: "<red>你不能使用这里的容器。"
+  deny-interact: "<red>你不能在这里进行此操作。"
+
+  # 成员管理
+  member-added: "<green>已添加成员 <yellow>%player%</yellow>。"
+  member-removed: "<green>已移除成员 <yellow>%player%</yellow>。"
+  member-not-found: "<red>找不到玩家：<white>%player%</white>。"
+  member-already: "<red>该玩家已经是领地成员。"
+  member-is-owner: "<red>领地主人不能作为成员添加。"
+  member-limit: "<red>领地成员数量已达上限（<yellow>%max%</yellow>）。"
+  perm-granted: "<green>已授予 <yellow>%player%</yellow> 权限 <yellow>%flag%</yellow>。"
+  perm-revoked: "<green>已取消 <yellow>%player%</yellow> 权限 <yellow>%flag%</yellow>。"
+  setting-enabled: "<green>已开启设置 <yellow>%flag%</yellow>。"
+  setting-disabled: "<green>已关闭设置 <yellow>%flag%</yellow>。"
+  invalid-flag: "<red>未知的权限或设置：<white>%flag%</white>"
+
+  # 子区域（管理员/公会）
+  subregion-created: "<green>已创建子区域 <yellow>%name%</yellow>。"
+  subregion-removed: "<green>已删除子区域 <yellow>%name%</yellow>。"
+  subregion-failed: "<red>创建子区域失败：越界、重叠或参数无效。"
+  subregion-list-empty: "<gray>该领地没有子区域。"
+  subregion-list-header: "<gray>领地 <white>%name%</white> 的子区域："
